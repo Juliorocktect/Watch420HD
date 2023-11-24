@@ -1,11 +1,14 @@
 package com.watch.HD.Service;
 
 import com.watch.HD.Model.User;
+import com.watch.HD.Model.Video;
 import com.watch.HD.Repository.UserRepo;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,4 +41,11 @@ public class UserService {
         return HttpStatus.BAD_REQUEST;
     }
 
+    public ResponseEntity<List<Video>> getVideosByUser(String userId) {
+        Optional<User> byId = userRepo.findById(userId);
+        if (byId.isPresent()){
+            return ResponseEntity.ok(byId.get().getVideosUploaded());
+        }
+        return (ResponseEntity<List<Video>>) ResponseEntity.badRequest();
+    }
 }

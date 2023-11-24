@@ -1,6 +1,7 @@
 package com.watch.HD.Controller;
 
 import com.watch.HD.Model.User;
+import com.watch.HD.Model.Video;
 import com.watch.HD.Service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,10 +9,10 @@ import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @AllArgsConstructor
@@ -24,13 +25,21 @@ public class UserController {
         return ResponseEntity.ok(service.createUser(userName,passwd,pictureUrl,banner));
     }
     @PostMapping("/like")
-    public ResponseEntity<HttpStatus> like(@RequestParam String id){
-        return ResponseEntity.ok(service.like(id));
+    public HttpStatus like(@RequestParam String id){
+        return service.like(id);
     }
 
-    public ResponseEntity<HttpStatus> getUserPerId(){}
+    @GetMapping("/getUser")
+    public ResponseEntity<Optional<User>> getUserPerId(@RequestParam String userId)
+    {
+        return ResponseEntity.ok(service.getUserById(userId));
+    }
 
-    public ResponseEntity<HttpStatus> getvideosByUser(String userId){}
+    public ResponseEntity<List<Video>> getvideosByUser(String userId)
+    {
+
+        return service.getVideosByUser(userId);
+    }
 
     public ResponseEntity<HttpStatus> getTwentyMostTrendingUsers(){}
 

@@ -28,6 +28,8 @@ public class User {
     private String pictureUrl;
     private String bannerUrl;
     private ArrayList<String> liked;
+    @ManyToOne
+    private List<Video> videosUploaded;
 
     public User(String userName, String passwd, String pictureUrl, String bannerUrl) {
         this.userName = userName;
