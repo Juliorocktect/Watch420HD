@@ -38,8 +38,12 @@ public class User {
         this.pictureUrl = pictureUrl;
         this.bannerUrl = bannerUrl;
         this.liked = new ArrayList<>();
+        this.videosUploaded = new ArrayList<>();
     }
     public void addLiked(String like){
         liked.add(like);
+    }
+    public void addToUploaded(String videoId){
+        videosUploaded.add(videoId);
     }
 }

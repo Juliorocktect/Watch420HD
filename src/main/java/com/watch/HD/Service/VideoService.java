@@ -56,6 +56,13 @@ public class VideoService {
         }
         return (ResponseEntity<Video>) ResponseEntity.badRequest();
     }
+    public Video getVideoWithId(String videoId){
+        Optional<Video> byId = videoRepo.findById(videoId);
+        if (byId.isPresent()){
+            return byId.get();
+        }
+        return null;
+    }
     public ResponseEntity<List<Video>> getTenVideos(){
         List<Video> list = videoRepo.findAll().stream().limit(10).toList();
         if (list.size() < 10){

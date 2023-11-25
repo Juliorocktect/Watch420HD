@@ -22,9 +22,10 @@ import java.util.Optional;
 public class UserController {
     private final UserService service;
     @PostMapping("/createUser")
-    public ResponseEntity<HttpStatus> createUser(@RequestParam String userName,@RequestParam String passwd,@RequestParam String pictureUrl,@RequestParam String banner){
-        return ResponseEntity.ok(service.createUser(userName,passwd,pictureUrl,banner));
+    public ResponseEntity<HttpStatus> createUser(@RequestParam String userName,@RequestParam String passwd,@RequestParam String pictureUrl,@RequestParam String bannerUrl){
+        return ResponseEntity.ok(service.createUser(userName,passwd,pictureUrl,bannerUrl));
     }
+    //TODO: why is it here
     @PostMapping("/like")
     public HttpStatus like(@RequestParam String videoId){
         return service.like(videoId);
@@ -35,12 +36,12 @@ public class UserController {
     {
         return ResponseEntity.ok(service.getUserById(userId));
     }
-/*
-    public ResponseEntity<List<Video>> getvideosByUser(String userId)
+    @GetMapping("/getVideosByUser")
+    public ResponseEntity<List<Video>> getVideosByUser(String userId)
     {
         return service.getVideosByUser(userId);
     }
-    */
+
 
     public ResponseEntity<HttpStatus> getTwentyMostTrendingUsers(){return null;}
 
