@@ -25,12 +25,6 @@ public class UserController {
     public ResponseEntity<HttpStatus> createUser(@RequestParam String userName,@RequestParam String passwd,@RequestParam String pictureUrl,@RequestParam String bannerUrl){
         return ResponseEntity.ok(service.createUser(userName,passwd,pictureUrl,bannerUrl));
     }
-    //TODO: why is it here
-    @PostMapping("/like")
-    public HttpStatus like(@RequestParam String videoId){
-        return service.like(videoId);
-    }
-
     @GetMapping("/getUser")
     public ResponseEntity<Optional<User>> getUserPerId(@RequestParam String userId)
     {

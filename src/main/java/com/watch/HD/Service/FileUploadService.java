@@ -33,9 +33,10 @@ public class FileUploadService {
     private String getVideoUrl(){return "";}
     public boolean uploadThumbnail(MultipartFile file,String videoId,String title) {
         try {
+            //TODO: rename file to id
             if (!file.isEmpty() && videoId != null){
                 file.transferTo(new File(PATH + videoId + "/" + file.getOriginalFilename()));
-                renameFileThumnail(file.getOriginalFilename(),title,videoId,file.getContentType());
+                renameFileThumnail(file.getOriginalFilename(),videoId,videoId,file.getContentType());
                 return true;
             }
             return false;
