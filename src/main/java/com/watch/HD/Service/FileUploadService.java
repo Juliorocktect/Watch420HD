@@ -12,10 +12,6 @@ import java.sql.SQLOutput;
 public class FileUploadService {
     private final String PATH = "/srv/http/";
 
-    public static void setVideoData(MultipartFile file,String id) {
-
-    }
-
     public boolean uploadVideo(MultipartFile file,String videoId,String title){
         try{
             if(!file.isEmpty() && videoId != null) {

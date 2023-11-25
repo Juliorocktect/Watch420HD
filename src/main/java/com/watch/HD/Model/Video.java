@@ -1,8 +1,10 @@
 package com.watch.HD.Model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -21,13 +23,14 @@ public class Video {
     private String description;
     private int likes;
     private int views;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     private Content thumbnailData;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     private Content videoData;
     private LocalDateTime uploadDate;
-
-    public Video(String title,String authorId,String description)
+    //default constructor
+    public Video(){}
+    public Video(String title, String authorId, String description)
     {
         this.title = title;
         this.authorId = authorId;
@@ -36,6 +39,7 @@ public class Video {
         likes = 0;
         videoData = new Content(title);
         thumbnailData = new Content(title);
+        uploadDate = LocalDateTime.now();
     }
     public void view(){views++;}
     public void  like(){likes++;}

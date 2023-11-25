@@ -40,7 +40,7 @@ public class UserService {
         }
         return HttpStatus.BAD_REQUEST;
     }
-
+/*
     public ResponseEntity<List<Video>> getVideosByUser(String userId) {
         Optional<User> byId = userRepo.findById(userId);
         if (byId.isPresent()){
@@ -48,4 +48,5 @@ public class UserService {
         }
         return (ResponseEntity<List<Video>>) ResponseEntity.badRequest();
     }
+ */
 }

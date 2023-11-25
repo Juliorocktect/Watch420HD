@@ -7,10 +7,10 @@ import com.watch.HD.Repository.VideoRepo;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,8 +32,11 @@ public class VideoService {
                     && (videoRepo.findById(video.getId()).isPresent()))
                     && (fileUploadService.uploadThumbnail(thumbnail, video.getId()))
             ) {
-                    video.setVideoData(new Content(video.getTitle(),videoFile.getContentType(),getVideoUrl(video.getId()),videoFile.getSize()));
-                    video.setThumbnailData(new Content(video.getTitle(),thumbnail.getContentType(),getThumbnailUrl(video.getId()),thumbnail.getSize()));
+                    Content videoContent = new Content(video.getTitle(),videoFile.getContentType(),getVideoUrl(video.getId()),videoFile.getSize());
+                    Content thumbnailContent = new Content(video.getTitle(),thumbnail.getContentType(),getThumbnailUrl(video.getId()),thumbnail.getSize());
+                    video.setVideoData(videoContent);
+                    video.setThumbnailData(thumbnailContent);
+                    videoRepo.save(video);
                     return HttpStatus.OK;
             }
         }
@@ -46,8 +49,26 @@ public class VideoService {
         }
         return "bad";
     }
-    public List<Video> getTenVideos(){
-        return videoRepo.findAll().stream().limit(10).toList();
+    public ResponseEntity<Video> getVideoById(String videoId){
+        Optional<Video> byId = videoRepo.findById(videoId);
+        if (byId.isPresent()){
+            return ResponseEntity.ok(byId.get());
+        }
+        return (ResponseEntity<Video>) ResponseEntity.badRequest();
+    }
+    public ResponseEntity<List<Video>> getTenVideos(){
+        List<Video> list = videoRepo.findAll().stream().limit(10).toList();
+        if (list.size() < 10){
+            return (ResponseEntity<List<Video>>) ResponseEntity.badRequest();
+        }
+        return ResponseEntity.ok(list);
+    }
+    public ResponseEntity<List<Video>> getVideosByLimit(int limit){
+        List<Video> list = videoRepo.findAll().stream().limit(limit).toList();
+        if (list.size() < limit){
+            return (ResponseEntity<List<Video>>) ResponseEntity.badRequest();
+        }
+        return ResponseEntity.ok(list);
     }
     public Optional<User> getAuthor(String videoId)
     {
@@ -76,6 +97,15 @@ public class VideoService {
     {
         return videoRepo.findById(videoId).isPresent();
     }
-    public HttpStatus view(){return null;}
+    public HttpStatus view(String videoId)
+    {
+        Optional<Video> byId = videoRepo.findById(videoId);
+        if(byId.isPresent()){
+            byId.get().view();
+            videoRepo.save(byId.get());
+            return HttpStatus.OK;
+        }
+        return HttpStatus.BAD_REQUEST;
+    }
     public HttpStatus like(){return null;}
 }

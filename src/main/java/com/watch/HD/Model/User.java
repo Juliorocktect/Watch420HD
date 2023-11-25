@@ -17,7 +17,6 @@ import java.util.List;
 @Data
 @Entity
 @AllArgsConstructor
-@NoArgsConstructor
 public class User {
     @Id
     @GeneratedValue(generator = "uuid")
@@ -28,8 +27,10 @@ public class User {
     private String pictureUrl;
     private String bannerUrl;
     private ArrayList<String> liked;
-    @ManyToOne
-    private List<Video> videosUploaded;
+    private ArrayList<String> videosUploaded;
+    //default Constructor
+    public User(){
+    }
 
     public User(String userName, String passwd, String pictureUrl, String bannerUrl) {
         this.userName = userName;

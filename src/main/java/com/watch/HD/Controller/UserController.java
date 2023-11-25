@@ -18,6 +18,7 @@ import java.util.Optional;
 @AllArgsConstructor
 @CrossOrigin("localhost")
 @Component
+@RequestMapping("/user")
 public class UserController {
     private final UserService service;
     @PostMapping("/createUser")
@@ -25,8 +26,8 @@ public class UserController {
         return ResponseEntity.ok(service.createUser(userName,passwd,pictureUrl,banner));
     }
     @PostMapping("/like")
-    public HttpStatus like(@RequestParam String id){
-        return service.like(id);
+    public HttpStatus like(@RequestParam String videoId){
+        return service.like(videoId);
     }
 
     @GetMapping("/getUser")
@@ -34,14 +35,14 @@ public class UserController {
     {
         return ResponseEntity.ok(service.getUserById(userId));
     }
-
+/*
     public ResponseEntity<List<Video>> getvideosByUser(String userId)
     {
-
         return service.getVideosByUser(userId);
     }
+    */
 
-    public ResponseEntity<HttpStatus> getTwentyMostTrendingUsers(){}
+    public ResponseEntity<HttpStatus> getTwentyMostTrendingUsers(){return null;}
 
     //TODO: Notifications ProfileTab
 

@@ -1,8 +1,10 @@
 package com.watch.HD.Model;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import lombok.Data;
+import org.hibernate.annotations.GenericGenerator;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -10,7 +12,9 @@ import org.springframework.stereotype.Component;
 @Entity
 public class Content {
     @Id
-    private Integer id;
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "uuid2")
+    private String id;
     private String name;
     private String url;
     private String type;
