@@ -20,7 +20,7 @@ public class FileUploadService {
                 file.transferTo(new File(PATH +videoId + "/" +file.getOriginalFilename()));
                 if(title != null)
                 {
-                    renameFile(file.getOriginalFilename(),title,videoId);
+                    renameFile(file.getOriginalFilename(),title,videoId,file.getContentType());
                 }
                 return true;
             }
@@ -33,9 +33,10 @@ public class FileUploadService {
     private String getVideoUrl(){return "";}
     public boolean uploadThumbnail(MultipartFile file,String videoId,String title) {
         try {
+            //TODO: rename file to id
             if (!file.isEmpty() && videoId != null){
                 file.transferTo(new File(PATH + videoId + "/" + file.getOriginalFilename()));
-                renameFileThumnail(file.getOriginalFilename(),title,videoId,file.getContentType());
+                renameFileThumnail(file.getOriginalFilename(),videoId,videoId,file.getContentType());
                 return true;
             }
             return false;
@@ -47,9 +48,9 @@ public class FileUploadService {
     public void createDirectoryForVideo(String videoId){
         new File(PATH + videoId).mkdir();
     }
-    private String renameFile(String oldname,String newName,String videoId){
+    private String renameFile(String oldname,String newName,String videoId,String type){
         File file = new File(PATH + videoId +"/" + oldname);
-        File rename = new File(PATH + videoId +"/" + newName + ".mp4");
+        File rename = new File(PATH + videoId +"/" + newName + convertVideoFileTypeToString(type));
         boolean status = file.renameTo(rename);
         if (status){
             return "success";
@@ -58,12 +59,44 @@ public class FileUploadService {
     }
     private String renameFileThumnail(String oldname,String newName,String videoId,String type){
         File file = new File(PATH + videoId +"/" + oldname);
-        File rename = new File(PATH + videoId +"/" + newName + type);
+        File rename = new File(PATH + videoId +"/" + newName + converteFileTypeToString(type));
         boolean status = file.renameTo(rename);
         if (status){
             return "success";
         }
         return "failed";
+    }
+    //TODO: FileTypeConverterForVideoTypes
+
+    private String convertVideoFileTypeToString(String fileType){
+        String convertedString = "";
+        switch (fileType){
+            case "video/mp4":
+                convertedString = ".mp4";
+                break;
+            case "video/mov":
+                convertedString = ".mov";
+                break;
+            case "video/mkv":
+                convertedString = ".mkv";
+        }
+        return convertedString;
+    }
+    private String converteFileTypeToString(String fileType){
+        String convertedString = "";
+        switch(fileType){
+            case "image/jpg":
+                convertedString = ".jpg";
+                break;
+            case "image/png":
+                convertedString = ".png";
+                break;
+            case "image/jpeg":
+                convertedString = ".jpeg";
+            default:
+                System.out.println("Falscher DateiTyp");
+        }
+        return convertedString;
     }
 
 }

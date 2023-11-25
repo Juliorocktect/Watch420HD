@@ -13,8 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
-
-//TODO: implement Methods
 @Service
 @AllArgsConstructor
 public class VideoService {
@@ -32,12 +30,10 @@ public class VideoService {
                     && (videoRepo.findById(video.getId()).isPresent()))
                     && (fileUploadService.uploadThumbnail(thumbnail, video.getId(),video.getTitle()))
             ) {
-                    Content videoContent = new Content(video.getTitle(),videoFile.getContentType(),getVideoUrl(video.getId()),videoFile.getSize());
-                    Content thumbnailContent = new Content(video.getTitle(),thumbnail.getContentType(),getThumbnailUrl(video.getId()),thumbnail.getSize());
-                    video.setVideoData(videoContent);
-                    video.setThumbnailData(thumbnailContent);
-                    video.setThumbnailUrl(getThumbnailOutUrl(video.getId(),video.getTitle(),thumbnailContent.getType()));
-                    video.setThumbnailUrl(getVideoUrl(video.getId()));
+                    video.setVideoData( new Content(video.getTitle(),videoFile.getContentType(),getVideoUrl(video.getId()),videoFile.getSize()));
+                    video.setThumbnailData(new Content(video.getTitle(),thumbnail.getContentType(),getThumbnailOutUrl(video.getId(),thumbnail.getContentType()),thumbnail.getSize()));
+                    video.setThumbnailUrl(getThumbnailOutUrl(video.getId(),thumbnail.getContentType()));
+                    video.setVideoUrl(getVideoUrl(video.getId()));
                     videoRepo.save(video);
                     return HttpStatus.OK;
             }
@@ -65,8 +61,21 @@ public class VideoService {
         }
         return null;
     }
-    private String getThumbnailOutUrl(String videoId,String videoTitle,String type){
-        return "http://localhost/" + videoId + "/" + videoTitle + type;
+    private String getThumbnailOutUrl(String videoId,String type){
+        String typeFinished = "";
+        switch(type){
+            case "image/jpg":
+                typeFinished = ".jpg";
+                break;
+            case "image/png":
+                typeFinished = ".png";
+                break;
+            case "image/jpeg":
+                typeFinished = ".jpeg";
+            default:
+                System.out.println("Falscher DateiTyp");
+        }
+        return "http://localhost/" + videoId + "/" + videoId + typeFinished;
     }
     public ResponseEntity<List<Video>> getTenVideos(){
         List<Video> list = videoRepo.findAll().stream().limit(10).toList();
@@ -101,7 +110,7 @@ public class VideoService {
     }
     public String getVideoUrl(String videoId){
         if(checkIfVideoExists(videoId)){
-            return "http://localhost:9090/video/" + getTitle(videoId);
+            return "http://localhost:9090/video/getVideo?videoId=" + videoId;
         }
         return null;
     }

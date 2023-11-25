@@ -19,7 +19,6 @@ import java.util.List;
 @CrossOrigin("http://localhost:3000")
 @RequestMapping("/video")
 public class VideoController {
-    //TODO: implement methods
     private final VideoService videoService;
     private final StreamingService streamingService;
 
