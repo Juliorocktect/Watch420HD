@@ -6,6 +6,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.sql.SQLOutput;
 
 @Service
@@ -30,10 +31,11 @@ public class FileUploadService {
         return false;
     }
     private String getVideoUrl(){return "";}
-    public boolean uploadThumbnail(MultipartFile file,String videoId) {
+    public boolean uploadThumbnail(MultipartFile file,String videoId,String title) {
         try {
             if (!file.isEmpty() && videoId != null){
                 file.transferTo(new File(PATH + videoId + "/" + file.getOriginalFilename()));
+                renameFileThumnail(file.getOriginalFilename(),title,videoId,file.getContentType());
                 return true;
             }
             return false;
@@ -48,6 +50,15 @@ public class FileUploadService {
     private String renameFile(String oldname,String newName,String videoId){
         File file = new File(PATH + videoId +"/" + oldname);
         File rename = new File(PATH + videoId +"/" + newName + ".mp4");
+        boolean status = file.renameTo(rename);
+        if (status){
+            return "success";
+        }
+        return "failed";
+    }
+    private String renameFileThumnail(String oldname,String newName,String videoId,String type){
+        File file = new File(PATH + videoId +"/" + oldname);
+        File rename = new File(PATH + videoId +"/" + newName + type);
         boolean status = file.renameTo(rename);
         if (status){
             return "success";

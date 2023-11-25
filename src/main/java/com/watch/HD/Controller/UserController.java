@@ -41,8 +41,6 @@ public class UserController {
     {
         return service.getVideosByUser(userId);
     }
-
-
     public ResponseEntity<HttpStatus> getTwentyMostTrendingUsers(){return null;}
 
     //TODO: Notifications ProfileTab

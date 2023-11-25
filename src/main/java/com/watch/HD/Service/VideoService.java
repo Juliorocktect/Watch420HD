@@ -30,12 +30,14 @@ public class VideoService {
             videoRepo.save(video);
             if((fileUploadService.uploadVideo(videoFile,video.getId(),video.getTitle())
                     && (videoRepo.findById(video.getId()).isPresent()))
-                    && (fileUploadService.uploadThumbnail(thumbnail, video.getId()))
+                    && (fileUploadService.uploadThumbnail(thumbnail, video.getId(),video.getTitle()))
             ) {
                     Content videoContent = new Content(video.getTitle(),videoFile.getContentType(),getVideoUrl(video.getId()),videoFile.getSize());
                     Content thumbnailContent = new Content(video.getTitle(),thumbnail.getContentType(),getThumbnailUrl(video.getId()),thumbnail.getSize());
                     video.setVideoData(videoContent);
                     video.setThumbnailData(thumbnailContent);
+                    video.setThumbnailUrl(getThumbnailOutUrl(video.getId(),video.getTitle(),thumbnailContent.getType()));
+                    video.setThumbnailUrl(getVideoUrl(video.getId()));
                     videoRepo.save(video);
                     return HttpStatus.OK;
             }
@@ -62,6 +64,9 @@ public class VideoService {
             return byId.get();
         }
         return null;
+    }
+    private String getThumbnailOutUrl(String videoId,String videoTitle,String type){
+        return "http://localhost/" + videoId + "/" + videoTitle + type;
     }
     public ResponseEntity<List<Video>> getTenVideos(){
         List<Video> list = videoRepo.findAll().stream().limit(10).toList();

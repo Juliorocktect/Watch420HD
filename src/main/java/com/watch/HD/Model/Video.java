@@ -23,6 +23,8 @@ public class Video {
     private String description;
     private int likes;
     private int views;
+    private String videoUrl;
+    private String thumbnailUrl;
     @ManyToOne(cascade = CascadeType.ALL)
     private Content thumbnailData;
     @ManyToOne(cascade = CascadeType.ALL)
@@ -37,6 +39,8 @@ public class Video {
         this.description = description;
         views = 0;
         likes = 0;
+        videoUrl = "";
+        thumbnailUrl = "";
         videoData = new Content(title);
         thumbnailData = new Content(title);
         uploadDate = LocalDateTime.now();

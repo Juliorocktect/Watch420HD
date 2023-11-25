@@ -57,6 +57,11 @@ public class VideoController {
     public ResponseEntity<Mono<Resource>> getVideo(@RequestParam String videoId){
         return streamingService.getVideo(videoId);
     }
+    @GetMapping("/thumbnail")
+    public String thumbnail(@RequestParam String videoId)
+    {
+        return "";
+    }
     public ResponseEntity<HttpStatus> getTenMostTrending(){return null;}
     public ResponseEntity<HttpStatus> getAuthorIdPerVideoId(String videoId){return null;}
     public ResponseEntity<HttpStatus> like(){return null;}
