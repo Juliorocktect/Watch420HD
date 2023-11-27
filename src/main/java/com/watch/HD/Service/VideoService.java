@@ -13,6 +13,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Queue;
+
 @Service
 @AllArgsConstructor
 public class VideoService {
@@ -30,8 +32,8 @@ public class VideoService {
                     && (videoRepo.findById(video.getId()).isPresent()))
                     && (fileUploadService.uploadThumbnail(thumbnail, video.getId(),video.getTitle()))
             ) {
-                    video.setVideoData( new Content(video.getTitle(),videoFile.getContentType(),getVideoUrl(video.getId()),videoFile.getSize()));
-                    video.setThumbnailData(new Content(video.getTitle(),thumbnail.getContentType(),getThumbnailOutUrl(video.getId(),thumbnail.getContentType()),thumbnail.getSize()));
+                    video.setVideoData( new Content(video.getTitle(),convert(videoFile.getContentType()),getVideoUrl(video.getId()),videoFile.getSize()));
+                    video.setThumbnailData(new Content(video.getTitle(),convert(thumbnail.getContentType()),getThumbnailOutUrl(video.getId(),thumbnail.getContentType()),thumbnail.getSize()));
                     video.setThumbnailUrl(getThumbnailOutUrl(video.getId(),thumbnail.getContentType()));
                     video.setVideoUrl(getVideoUrl(video.getId()));
                     videoRepo.save(video);
@@ -76,6 +78,30 @@ public class VideoService {
                 System.out.println("Falscher DateiTyp");
         }
         return "http://localhost/" + videoId + "/" + videoId + typeFinished;
+    }
+    public String convert(String type){
+        String convertedString = "";
+        switch(type) {
+            case "image/jpg":
+                convertedString = ".jpg";
+                break;
+            case "image/png":
+                convertedString = ".png";
+                break;
+            case "image/jpeg":
+                convertedString = ".jpeg";
+            case "video/mp4":
+                convertedString = ".mp4";
+                break;
+            case "video/mov":
+                convertedString = ".mov";
+                break;
+            case "video/mkv":
+                convertedString = ".mkv";
+            default:
+                convertedString = "false";
+        }
+        return convertedString;
     }
     public ResponseEntity<List<Video>> getTenVideos(){
         List<Video> list = videoRepo.findAll().stream().limit(10).toList();
@@ -128,5 +154,40 @@ public class VideoService {
         }
         return HttpStatus.BAD_REQUEST;
     }
-    public HttpStatus like(){return null;}
+    public HttpStatus like(String videoId)
+    {
+        Optional<Video> videoById = videoRepo.findById(videoId);
+        if (videoById.isPresent()){
+            videoById.get().like();
+            videoRepo.save(videoById.get());
+            return HttpStatus.OK;
+        }
+        return HttpStatus.BAD_REQUEST;
+    }
+
+    public ResponseEntity<Queue<Video>> getTenMostTrending() {
+        List<Video> videoList = videoRepo.findAll().stream().limit(10).toList();
+        Queue<Video> videos = null;
+        for (Video v:videoList){
+            videos.add(v);
+        }
+        Queue<Video> hilfsQ = null;
+        Video safe;
+        while (!videos.isEmpty()) {
+            safe = videos.element();
+            while (!videos.isEmpty()) {
+                if (videos.element().getLikes() > safe.getLikes()) {
+                    hilfsQ.add(safe);
+                    safe = videos.element();
+                    videos.remove();
+                } else {
+                    hilfsQ.add(videos.element());
+                    videos.remove();
+                }
+                videos = hilfsQ;
+            }
+        }
+        //TODO: add bad request trigger
+        return ResponseEntity.ok(videos);
+    }
 }

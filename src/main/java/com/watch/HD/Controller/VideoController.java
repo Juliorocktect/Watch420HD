@@ -12,7 +12,9 @@ import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Mono;
 
 import java.net.http.HttpResponse;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 @RestController
 @Component
@@ -61,13 +63,20 @@ public class VideoController {
     {
         return "";
     }
-    public ResponseEntity<HttpStatus> getTenMostTrending(){return null;}
+    public ResponseEntity<Queue<Video>> getTenMostTrending(){
+        return videoService.getTenMostTrending();
+    }
     public ResponseEntity<HttpStatus> getAuthorIdPerVideoId(String videoId){return null;}
     public ResponseEntity<HttpStatus> like(){return null;}
     @PostMapping("/view")
     public HttpStatus view(@RequestParam String videoId)
     {
         return videoService.view(videoId);
+    }
+    @PostMapping("/like")
+    public HttpStatus like(@RequestParam String videoId)
+    {
+        return videoService.like(videoId);
     }
 
 }

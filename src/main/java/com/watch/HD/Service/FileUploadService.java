@@ -8,7 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.sql.SQLOutput;
-
+//TODO: make uploadProfile Pic & Banner method
 @Service
 public class FileUploadService {
     private final String PATH = "/srv/http/";
