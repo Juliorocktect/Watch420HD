@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,8 +23,8 @@ import java.util.Optional;
 public class UserController {
     private final UserService service;
     @PostMapping("/createUser")
-    public ResponseEntity<HttpStatus> createUser(@RequestParam String userName,@RequestParam String passwd,@RequestParam String pictureUrl,@RequestParam String bannerUrl){
-        return ResponseEntity.ok(service.createUser(userName,passwd,pictureUrl,bannerUrl));
+    public ResponseEntity<HttpStatus> createUser(@RequestParam String userName, @RequestParam String passwd, @RequestParam("picture")MultipartFile picture, @RequestParam("banner") MultipartFile banner){
+        return ResponseEntity.ok(service.createUser(userName,passwd,picture,banner));
     }
     @GetMapping("/getUser")
     public ResponseEntity<Optional<User>> getUserPerId(@RequestParam String userId)

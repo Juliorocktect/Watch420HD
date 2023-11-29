@@ -32,11 +32,11 @@ public class User {
     public User(){
     }
 
-    public User(String userName, String passwd, String pictureUrl, String bannerUrl) {
+    public User(String userName, String passwd) {
         this.userName = userName;
         this.passwd = passwd;
-        this.pictureUrl = pictureUrl;
-        this.bannerUrl = bannerUrl;
+        this.pictureUrl = "";
+        this.bannerUrl = "";
         this.liked = new ArrayList<>();
         this.videosUploaded = new ArrayList<>();
     }

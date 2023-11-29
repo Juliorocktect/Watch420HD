@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,10 +21,17 @@ public class UserService {
     private final UserRepo userRepo;
     @Autowired
     private VideoRepo videoRepo;
-    public HttpStatus createUser(String userName, String passWd, String pictureUrl, String bannerUrl){
-        User user = new User(userName,passWd,pictureUrl,bannerUrl);
+    @Autowired
+    FileUploadService uploadService;
+    public HttpStatus createUser(String userName, String passWd, MultipartFile picuture,MultipartFile banner){
+        User user = new User(userName,passWd);
         userRepo.save(user);
-        if(userRepo.findById(user.getId()).isPresent()){
+        if(userRepo.findById(user.getId()).isPresent()
+                && uploadService.uploadProfileBanner(banner,user.getId())
+                && uploadService.uploadProfilePicture(picuture,user.getId())){
+            user.setBannerUrl(uploadService.getBannerPath(user.getId(),banner.getContentType()));
+            user.setPictureUrl(uploadService.getPicturePath(user.getId(),picuture.getContentType()));
+            userRepo.save(user);
             return HttpStatus.OK;
         }
         return HttpStatus.BAD_REQUEST;
@@ -66,4 +74,5 @@ public class UserService {
         }
         return ResponseEntity.badRequest().build();
     }
+
 }

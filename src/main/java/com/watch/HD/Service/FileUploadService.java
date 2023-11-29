@@ -1,5 +1,6 @@
 package com.watch.HD.Service;
 
+import ch.qos.logback.core.net.SyslogOutputStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -13,10 +14,14 @@ import java.sql.SQLOutput;
 public class FileUploadService {
     private final String PATH = "/srv/http/";
 
+    private final String USER_PATH = "/srv/http/users/";
+
+    private final String VIDEO_PATH = "/srv/http/videos/";
+
     public boolean uploadVideo(MultipartFile file,String videoId,String title){
         try{
             if(!file.isEmpty() && videoId != null) {
-                createDirectoryForVideo(videoId);
+                createDirectoryForId(videoId);
                 file.transferTo(new File(PATH +videoId + "/" +file.getOriginalFilename()));
                 if(title != null)
                 {
@@ -36,7 +41,7 @@ public class FileUploadService {
             //TODO: rename file to id
             if (!file.isEmpty() && videoId != null){
                 file.transferTo(new File(PATH + videoId + "/" + file.getOriginalFilename()));
-                renameFileThumnail(file.getOriginalFilename(),videoId,videoId,file.getContentType());
+                renameFileImage(file.getOriginalFilename(),videoId,videoId,converteFileTypeToString(file.getContentType()));
                 return true;
             }
             return false;
@@ -45,8 +50,50 @@ public class FileUploadService {
             return false;
         }
     }
-    public void createDirectoryForVideo(String videoId){
-        new File(PATH + videoId).mkdir();
+    public boolean uploadProfilePicture(MultipartFile file,String userId){
+        try{
+            if(!file.isEmpty() && userId != null)
+            {
+                File directory = new File(USER_PATH + userId + "/");
+                if(!directory.exists()){
+                    createDirectoryForUserId(userId);
+                }
+                file.transferTo(new File(USER_PATH + userId + "/" + file.getOriginalFilename()));
+                renameFileImage(USER_PATH,file.getOriginalFilename(),"profilePicture",userId,file.getContentType());
+                return true;
+            }
+            return false;
+        } catch (IOException e){
+            System.out.println("Fehler bei einer IO Operation" + e.getMessage());
+            return false;
+        }
+    }
+    public boolean uploadProfileBanner(MultipartFile file,String userId){
+        try{
+            if(!file.isEmpty() && userId != null)
+            {
+                File directory = new File(USER_PATH + userId + "/");
+                if(!directory.exists()){
+                    createDirectoryForUserId(userId);
+                }
+                file.transferTo(new File(USER_PATH + userId + "/" + file.getOriginalFilename()));
+                renameFileImage(USER_PATH,file.getOriginalFilename(),"bannerPicture",userId,file.getContentType());
+                return true;
+            }
+            return false;
+        } catch (IOException e){
+            System.out.println("Fehler bei einer IO Operation" + e.getMessage());
+            return false;
+        }
+    }
+
+    private void createDirectoryForUserId(String userId) {
+        new File(PATH + "/users").mkdir();
+        new File(PATH + "/users/" + userId).mkdir();
+    }
+
+    public void createDirectoryForId(String id){
+        new File(PATH + id).mkdir();
     }
     private String renameFile(String oldname,String newName,String videoId,String type){
         File file = new File(PATH + videoId +"/" + oldname);
@@ -57,16 +104,24 @@ public class FileUploadService {
         }
         return "failed";
     }
-    private String renameFileThumnail(String oldname,String newName,String videoId,String type){
-        File file = new File(PATH + videoId +"/" + oldname);
-        File rename = new File(PATH + videoId +"/" + newName + converteFileTypeToString(type));
+    private String renameFileImage(String oldname,String newName,String videoId,String type) {
+        File file = new File(PATH + videoId + "/" + oldname);
+        File rename = new File(PATH + videoId + "/" + newName + converteFileTypeToString(type));
         boolean status = file.renameTo(rename);
-        if (status){
-            return "success";
+        if (status) {
+            return "success"; // was hab ich mir dabei gedacht?
         }
         return "failed";
     }
-    //TODO: FileTypeConverterForVideoTypes
+    private String renameFileImage(String path,String oldname,String newName,String videoId,String type) {
+        File file = new File(path + videoId + "/" + oldname);
+        File rename = new File(path + videoId + "/" + newName + converteFileTypeToString(type));
+        boolean status = file.renameTo(rename);
+        if (status) {
+            return "success"; // was hab ich mir dabei gedacht?
+        }
+        return "failed";
+    }
 
     private String convertVideoFileTypeToString(String fileType){
         String convertedString = "";
@@ -92,11 +147,17 @@ public class FileUploadService {
                 convertedString = ".png";
                 break;
             case "image/jpeg":
-                convertedString = ".jpeg";
+                convertedString = ".jpeg";// ist btw das gleiche wie jpg
             default:
                 System.out.println("Falscher DateiTyp");
         }
         return convertedString;
+    }
+    public String getBannerPath(String userId,String type){
+        return "http://localhost/users/" + userId + "/" + "bannerPicture" + converteFileTypeToString(type);
+    }
+    public String getPicturePath(String userId,String type){
+        return "http://localhost/users/" + userId + "/" + "profilePicture" + converteFileTypeToString(type);
     }
 
 }
