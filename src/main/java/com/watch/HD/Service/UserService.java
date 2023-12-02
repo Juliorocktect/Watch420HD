@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -75,4 +76,18 @@ public class UserService {
         return ResponseEntity.badRequest().build();
     }
 
+    public ResponseEntity<String> getPictureById(String userId) {
+        Optional<User> byId = userRepo.findById(userId);
+        if (byId.isPresent()){
+            return ResponseEntity.ok(byId.get().getPictureUrl());
+        }
+        return ResponseEntity.badRequest().build();
+    }
+    public ResponseEntity<String> getBannerById(String userId){
+        Optional<User> byId = userRepo.findById(userId);
+        if(byId.isPresent()){
+            return ResponseEntity.ok(byId.get().getBannerUrl());
+        }
+        return ResponseEntity.badRequest().build();
+    }
 }

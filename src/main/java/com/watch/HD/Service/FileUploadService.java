@@ -1,15 +1,10 @@
 package com.watch.HD.Service;
 
-import ch.qos.logback.core.net.SyslogOutputStream;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.sql.SQLOutput;
-//TODO: make uploadProfile Pic & Banner method
 @Service
 public class FileUploadService {
     private final String PATH = "/srv/http/";
@@ -22,7 +17,7 @@ public class FileUploadService {
         try{
             if(!file.isEmpty() && videoId != null) {
                 createDirectoryForId(videoId);
-                file.transferTo(new File(PATH +videoId + "/" +file.getOriginalFilename()));
+                file.transferTo(new File(VIDEO_PATH + videoId + "/" +file.getOriginalFilename()));
                 if(title != null)
                 {
                     renameFile(file.getOriginalFilename(),title,videoId,file.getContentType());
@@ -40,8 +35,8 @@ public class FileUploadService {
         try {
             //TODO: rename file to id
             if (!file.isEmpty() && videoId != null){
-                file.transferTo(new File(PATH + videoId + "/" + file.getOriginalFilename()));
-                renameFileImage(file.getOriginalFilename(),videoId,videoId,converteFileTypeToString(file.getContentType()));
+                file.transferTo(new File(VIDEO_PATH + videoId + "/" + file.getOriginalFilename()));
+                renameFileImage(file.getOriginalFilename(),videoId,videoId,file.getContentType());
                 return true;
             }
             return false;
@@ -93,20 +88,22 @@ public class FileUploadService {
     }
 
     public void createDirectoryForId(String id){
-        new File(PATH + id).mkdir();
+        new File(PATH + "/videos").mkdir();
+        new File(PATH + "/videos/" + id).mkdir();
     }
     private String renameFile(String oldname,String newName,String videoId,String type){
-        File file = new File(PATH + videoId +"/" + oldname);
-        File rename = new File(PATH + videoId +"/" + newName + convertVideoFileTypeToString(type));
+        File file = new File(VIDEO_PATH + videoId +"/" + oldname);
+        File rename = new File(VIDEO_PATH + videoId +"/" + newName + convertVideoFileTypeToString(type));
         boolean status = file.renameTo(rename);
         if (status){
             return "success";
         }
         return "failed";
     }
+    //TODO: rename method
     private String renameFileImage(String oldname,String newName,String videoId,String type) {
-        File file = new File(PATH + videoId + "/" + oldname);
-        File rename = new File(PATH + videoId + "/" + newName + converteFileTypeToString(type));
+        File file = new File(VIDEO_PATH + videoId + "/" + oldname);
+        File rename = new File(VIDEO_PATH + videoId + "/" + newName + converteFileTypeToString(type));
         boolean status = file.renameTo(rename);
         if (status) {
             return "success"; // was hab ich mir dabei gedacht?

@@ -25,6 +25,7 @@ public class Video {
     private int views;
     private String videoUrl;
     private String thumbnailUrl;
+    private String profilePicture;
     @ManyToOne(cascade = CascadeType.ALL)
     private Content thumbnailData;
     @ManyToOne(cascade = CascadeType.ALL)
@@ -32,7 +33,7 @@ public class Video {
     private LocalDateTime uploadDate;
     //default constructor
     public Video(){}
-    public Video(String title, String authorId, String description)
+    public Video(String title, String authorId, String description,String profilePicture)
     {
         this.title = title;
         this.authorId = authorId;
@@ -44,6 +45,7 @@ public class Video {
         videoData = new Content(title);
         thumbnailData = new Content(title);
         uploadDate = LocalDateTime.now();
+        this.profilePicture = profilePicture;
     }
     public void view(){views++;}
     public void  like(){likes++;}

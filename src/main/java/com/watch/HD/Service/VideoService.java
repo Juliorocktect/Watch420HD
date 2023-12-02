@@ -26,7 +26,7 @@ public class VideoService {
 
     public HttpStatus createNewVideo(String title, String authorId, String description, MultipartFile videoFile,MultipartFile thumbnail) {
         if (userService.checkIfUserExists(authorId)){
-            Video video = new Video(title,authorId,description);
+            Video video = new Video(title,authorId,description,userService.getUserById(authorId).get().getPictureUrl());
             videoRepo.save(video);
             if((fileUploadService.uploadVideo(videoFile,video.getId(),video.getTitle())
                     && (videoRepo.findById(video.getId()).isPresent()))
@@ -36,18 +36,11 @@ public class VideoService {
                     video.setThumbnailData(new Content(video.getTitle(),convert(thumbnail.getContentType()),getThumbnailOutUrl(video.getId(),thumbnail.getContentType()),thumbnail.getSize()));
                     video.setThumbnailUrl(getThumbnailOutUrl(video.getId(),thumbnail.getContentType()));
                     video.setVideoUrl(getVideoUrl(video.getId()));
-                    videoRepo.save(video);
+                    videoRepo.save(video); //TODO: delete video if problems
                     return HttpStatus.OK;
             }
         }
         return HttpStatus.BAD_REQUEST;
-    }
-    private String  getThumbnailUrl(String id){
-        Optional<Video> videoPerId = videoRepo.findById(id);
-        if (videoPerId.isPresent()){
-            return "classpath:videos/" + id +"/" + videoPerId.get().getThumbnailData().getName();
-        }
-        return "bad";
     }
     public ResponseEntity<Video> getVideoById(String videoId){
         Optional<Video> byId = videoRepo.findById(videoId);
@@ -77,7 +70,7 @@ public class VideoService {
             default:
                 System.out.println("Falscher DateiTyp");
         }
-        return "http://localhost/" + videoId + "/" + videoId + typeFinished;
+        return "http://localhost/videos/" + videoId + "/" + videoId + typeFinished;
     }
     public String convert(String type){
         String convertedString = "";

@@ -17,7 +17,7 @@ import java.util.Optional;
 
 @RestController
 @AllArgsConstructor
-@CrossOrigin("localhost")
+@CrossOrigin("http://localhost:3000")
 @Component
 @RequestMapping("/user")
 public class UserController {
@@ -35,6 +35,15 @@ public class UserController {
     public ResponseEntity<List<Video>> getVideosByUser(String userId)
     {
         return service.getVideosByUser(userId);
+    }
+
+    @GetMapping("/getProfilePicture")
+    public ResponseEntity<String> getProfilePicture(@RequestParam String userId){
+        return service.getPictureById(userId);
+    }
+    @GetMapping("/getBanner")
+    public ResponseEntity<String> getBanner(@RequestParam String userId){
+        return service.getBannerById(userId);
     }
     public ResponseEntity<HttpStatus> getTwentyMostTrendingUsers(){return null;}
 

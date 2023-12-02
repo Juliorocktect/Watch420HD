@@ -3,14 +3,9 @@ package com.watch.HD.Model;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Array;
 import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Type;
 import org.springframework.stereotype.Component;
-
 import java.util.ArrayList;
-import java.util.List;
 
 @Component
 @Table(name = "_user")
@@ -28,6 +23,7 @@ public class User {
     private String bannerUrl;
     private ArrayList<String> liked;
     private ArrayList<String> videosUploaded;
+    //subs
     //default Constructor
     public User(){
     }

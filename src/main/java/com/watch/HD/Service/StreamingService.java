@@ -22,7 +22,7 @@ public class StreamingService {
         if(video.getTitle() == null){
             return ResponseEntity.badRequest().build();
         }
-        String path = "file:///srv/http/" + videoId + "/" + "%s" + video.getVideoData().getType();
+        String path = "file:///srv/http/videos/" + videoId + "/" + "%s" + video.getVideoData().getType();
         return ResponseEntity.ok(Mono.fromSupplier(() -> resourceLoader.getResource(String.format(path,video.getTitle()))));
     }
 
