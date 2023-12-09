@@ -1,5 +1,6 @@
 package com.watch.HD.Service;
 
+import com.fasterxml.jackson.databind.ser.Serializers;
 import com.watch.HD.Model.User;
 import com.watch.HD.Model.Video;
 import com.watch.HD.Repository.UserRepo;
@@ -11,10 +12,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.net.http.HttpResponse;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import javax.crypto.*;
+import javax.crypto.spec.SecretKeySpec;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -24,36 +26,42 @@ public class UserService {
     private VideoRepo videoRepo;
     @Autowired
     FileUploadService uploadService;
-    public HttpStatus createUser(String userName, String passWd, MultipartFile picuture,MultipartFile banner){
-        User user = new User(userName,passWd);
+    private final String key = "16SpxPMv2DNyw1JpjpWwKg==";
+
+    public HttpStatus createUser(String userName, String passWd, MultipartFile picuture, MultipartFile banner) {
+        User user = new User(userName, passWd);
         userRepo.save(user);
-        if(userRepo.findById(user.getId()).isPresent()
-                && uploadService.uploadProfileBanner(banner,user.getId())
-                && uploadService.uploadProfilePicture(picuture,user.getId())){
-            user.setBannerUrl(uploadService.getBannerPath(user.getId(),banner.getContentType()));
-            user.setPictureUrl(uploadService.getPicturePath(user.getId(),picuture.getContentType()));
+        if (userRepo.findById(user.getId()).isPresent()
+                && uploadService.uploadProfileBanner(banner, user.getId())
+                && uploadService.uploadProfilePicture(picuture, user.getId())) {
+            user.setBannerUrl(uploadService.getBannerPath(user.getId(), banner.getContentType()));
+            user.setPictureUrl(uploadService.getPicturePath(user.getId(), picuture.getContentType()));
             userRepo.save(user);
             return HttpStatus.OK;
         }
         return HttpStatus.BAD_REQUEST;
     }
-    public HttpStatus addToUploaded(String userId,String videoId){
+
+    public HttpStatus addToUploaded(String userId, String videoId) {
         Optional<User> userById = getUserById(userId);
-        if(userById.isPresent()){
+        if (userById.isPresent()) {
             userById.get().addToUploaded(videoId);
             return HttpStatus.OK;
         }
         return HttpStatus.BAD_REQUEST;
     }
-    public boolean checkIfUserExists(String authorId){
+
+    public boolean checkIfUserExists(String authorId) {
         return userRepo.findById(authorId).isPresent();
     }
-    public Optional<User> getUserById(String userId){
+
+    public Optional<User> getUserById(String userId) {
         return userRepo.findById(userId);
     }
-    public HttpStatus like(String id){
+
+    public HttpStatus like(String id) {
         List<User> list = userRepo.findAll().stream().filter(p -> p.getId().equals(id)).toList();
-        if (!list.isEmpty()){
+        if (!list.isEmpty()) {
             User user = list.get(0);
             user.addLiked("0981293");
             userRepo.save(user);
@@ -61,13 +69,14 @@ public class UserService {
         }
         return HttpStatus.BAD_REQUEST;
     }
+
     public ResponseEntity<List<Video>> getVideosByUser(String userId) {
-         Optional<User> byId = userRepo.findById(userId);
-        if (byId.isPresent()){
+        Optional<User> byId = userRepo.findById(userId);
+        if (byId.isPresent()) {
             List<Video> videoList = new ArrayList<>();
-            for (String c: byId.get().getVideosUploaded()){
+            for (String c : byId.get().getVideosUploaded()) {
                 Optional<Video> videoById = videoRepo.findById(c);
-                if(videoById.isPresent()){
+                if (videoById.isPresent()) {
                     videoList.add(videoById.get());
                 }
             }
@@ -78,16 +87,49 @@ public class UserService {
 
     public ResponseEntity<String> getPictureById(String userId) {
         Optional<User> byId = userRepo.findById(userId);
-        if (byId.isPresent()){
+        if (byId.isPresent()) {
             return ResponseEntity.ok(byId.get().getPictureUrl());
         }
         return ResponseEntity.badRequest().build();
     }
-    public ResponseEntity<String> getBannerById(String userId){
+
+    public ResponseEntity<String> getBannerById(String userId) {
         Optional<User> byId = userRepo.findById(userId);
-        if(byId.isPresent()){
+        if (byId.isPresent()) {
             return ResponseEntity.ok(byId.get().getBannerUrl());
         }
         return ResponseEntity.badRequest().build();
     }
+
+    public void updatePath() {
+        List<User> all = userRepo.findAll();
+        for (User u : all) {
+            String oldPath = u.getPictureUrl();
+            u.setPictureUrl("http://192.168.178.95" + oldPath.substring(16));
+        }
+        userRepo.saveAll(all);
+    }
+    //TODO: fix auth section
+    public ResponseEntity<String> auth() {
+        //TODO: ijasd
+        return ResponseEntity.ok("");
+    }
+    public String decrypt(String encryptedText) throws NoSuchPaddingException, NoSuchAlgorithmException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
+        Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+        byte[] encoded =  Base64.getDecoder().decode(key);
+        SecretKey key = new SecretKeySpec(encoded,0,encoded.length,"AES");
+        cipher.init(Cipher.DECRYPT_MODE,key);
+        byte[] bytes = cipher.doFinal(Base64.getEncoder().encode(encryptedText.getBytes()));
+        return bytes.toString();
+    }
+
+    public String encrypt(String text) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
+        byte[] data = text.getBytes();
+        Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+        byte[] encoded =  Base64.getDecoder().decode(key);
+        SecretKey secretKey = new SecretKeySpec(encoded,0,encoded.length,"AES");
+        cipher.init(Cipher.ENCRYPT_MODE,secretKey);
+        return Base64.getDecoder().decode(cipher.doFinal(text.getBytes())).toString();
+    }
+
 }

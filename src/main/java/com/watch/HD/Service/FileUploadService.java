@@ -151,10 +151,17 @@ public class FileUploadService {
         return convertedString;
     }
     public String getBannerPath(String userId,String type){
-        return "http://localhost/users/" + userId + "/" + "bannerPicture" + converteFileTypeToString(type);
+        return "http://192.168.178.95/users/" + userId + "/" + "bannerPicture" + converteFileTypeToString(type);
     }
     public String getPicturePath(String userId,String type){
-        return "http://localhost/users/" + userId + "/" + "profilePicture" + converteFileTypeToString(type);
+        return "http://192.169.178.95/users/" + userId + "/" + "profilePicture" + converteFileTypeToString(type);
     }
+    public boolean deleteVideo(String videoId){
+        return false;
+    }
+    public boolean deleteUserData(String userId){
+        return false;
+    }
+
 
 }

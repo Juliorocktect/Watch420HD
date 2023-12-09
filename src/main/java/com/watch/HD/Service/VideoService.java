@@ -70,7 +70,7 @@ public class VideoService {
             default:
                 System.out.println("Falscher DateiTyp");
         }
-        return "http://localhost/videos/" + videoId + "/" + videoId + typeFinished;
+        return "http://192.168.178.95/videos/" + videoId + "/" + videoId + typeFinished;
     }
     public String convert(String type){
         String convertedString = "";
@@ -129,7 +129,7 @@ public class VideoService {
     }
     public String getVideoUrl(String videoId){
         if(checkIfVideoExists(videoId)){
-            return "http://localhost:9090/video/getVideo?videoId=" + videoId;
+            return "http://192.168.178.95:9090/video/getVideo?videoId=" + videoId;
         }
         return null;
     }
@@ -182,5 +182,14 @@ public class VideoService {
         }
         //TODO: add bad request trigger
         return ResponseEntity.ok(videos);
+    }
+    public void updatePath(){
+        List<Video> all = videoRepo.findAll();
+        for (Video v : all){
+            String oldPath = v.getVideoUrl();
+            v.setVideoUrl("http://192.168.178.95" + oldPath.substring(16));
+            v.setThumbnailUrl("http://192.168.178.95" + oldPath.substring(16));
+        }
+        videoRepo.saveAll(all);
     }
 }
