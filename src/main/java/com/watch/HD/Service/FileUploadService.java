@@ -1,10 +1,13 @@
 package com.watch.HD.Service;
 
+import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLOutput;
+
 @Service
 public class FileUploadService {
     private final String PATH = "/srv/http/";
@@ -152,14 +155,23 @@ public class FileUploadService {
     public String getPicturePath(String userId,String type){
         return "http://192.169.178.95/users/" + userId + "/" + "profilePicture" + converteFileTypeToString(type);
     }
-    //TODO: implement
     public boolean deleteVideo(String videoId){
-
-        return false;
+        try{
+            FileUtils.deleteDirectory(new File(VIDEO_PATH + videoId));
+            return true;
+        }catch (IOException e){
+            System.out.println("Error Deleting Video: " + e.getMessage());
+            return false;
+        }
     }
-    //TODO: implement
     public boolean deleteUserData(String userId){
-        return false;
+        try{
+            FileUtils.deleteDirectory(new File(USER_PATH + userId));
+            return true;
+        }catch (IOException e){
+            System.out.println("Error Deleting User: " + e.getMessage());
+            return false;
+        }
     }
 
 

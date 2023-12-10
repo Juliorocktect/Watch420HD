@@ -11,11 +11,14 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
+import javax.swing.*;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
@@ -150,4 +153,22 @@ public class UserService {
         return Base64.getDecoder().decode(cipher.doFinal(text.getBytes())).toString();
     }
 
+
+    public ResponseEntity<HttpStatus> delete(String userId, String session) {
+        if (checkIfUserExists(userId)){
+            if(sessionService.isActive(session) && sessionService.belongsToUser(session,userId)){
+                if (uploadService.deleteUserData(userId)) {
+                    userRepo.delete(userRepo.findById(userId).get()); //present check isnt needed
+                    sessionService.deleteSession(session);
+                    return ResponseEntity.ok(HttpStatus.OK);
+                }
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+
+            }
+            else{
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+        }
+        return ResponseEntity.badRequest().build();
+    }
 }

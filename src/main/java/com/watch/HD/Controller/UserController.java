@@ -71,4 +71,8 @@ public class UserController {
     public ResponseEntity<String> auth(@RequestParam String userName, @RequestParam String password){
         return service.auth(userName,password);
     }
+    @DeleteMapping("/delete")
+    public ResponseEntity<HttpStatus> delete(@RequestParam String userId,@RequestParam String session){
+        return service.delete(userId,session);
+    }
 }

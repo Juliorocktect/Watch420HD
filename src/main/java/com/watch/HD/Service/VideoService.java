@@ -187,6 +187,7 @@ public class VideoService {
         //TODO: add bad request trigger
         return ResponseEntity.ok(videos);
     }
+    //TODO: still needed
     public void updatePath(){
         List<Video> all = videoRepo.findAll();
         for (Video v : all){
@@ -195,5 +196,19 @@ public class VideoService {
             v.setThumbnailUrl("http://192.168.178.95" + oldPath.substring(16));
         }
         videoRepo.saveAll(all);
+    }
+
+    public ResponseEntity<HttpStatus> delete(String videoId, String session) {
+        if (sessionService.isActive(session)) {
+            if (fileUploadService.deleteVideo(videoId)) {
+                Optional<Video> byId = videoRepo.findById(videoId);
+                if (byId.isPresent()){
+                    videoRepo.delete(byId.get());
+                    return ResponseEntity.ok(HttpStatus.OK);
+                }
+            }
+            ResponseEntity.internalServerError().build();
+        }
+        return ResponseEntity.badRequest().build();
     }
 }

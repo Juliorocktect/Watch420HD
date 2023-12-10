@@ -77,5 +77,8 @@ public class VideoController {
     {
         return videoService.like(videoId,session);
     }
-
+    @DeleteMapping("/delete")
+    public ResponseEntity<HttpStatus> delete(@RequestParam String videoId,@RequestParam String session){
+        return videoService.delete(videoId,session);
+    }
 }

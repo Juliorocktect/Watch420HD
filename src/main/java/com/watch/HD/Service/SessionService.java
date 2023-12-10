@@ -44,4 +44,11 @@ public class SessionService {
         }
     }
 
+    public boolean belongsToUser(String session, String userId) {
+        Optional<Session> byUserId = sessionRepo.findByUserId(userId);
+        if (byUserId.isPresent()) {
+            return byUserId.get().getUserId().equals(userId) && byUserId.get().getSession().equals(session);
+        }
+        return false;
+    }
 }
