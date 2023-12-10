@@ -19,7 +19,6 @@ import java.util.Queue;
 @RestController
 @Component
 @CrossOrigin(origins = {"http://loclhost:3000","http://192.168.178.95:3000"})
-//TODO:add support for ip 192.168.178.95
 @RequestMapping("/video")
 public class VideoController {
     private final VideoService videoService;
@@ -74,9 +73,9 @@ public class VideoController {
         return videoService.view(videoId);
     }
     @PostMapping("/like")
-    public HttpStatus like(@RequestParam String videoId)
+    public HttpStatus like(@RequestParam String videoId,@RequestParam String session)
     {
-        return videoService.like(videoId);
+        return videoService.like(videoId,session);
     }
 
 }

@@ -9,6 +9,7 @@ import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,7 +24,7 @@ import java.util.Optional;
 @RestController
 @AllArgsConstructor
 @CrossOrigin(origins = {"http://loclhost:3000","http://192.168.178.95:3000"})
-@Component
+@Controller
 @RequestMapping("/user")
 public class UserController {
     private final UserService service;
@@ -31,7 +32,6 @@ public class UserController {
     public ResponseEntity<HttpStatus> createUser(@RequestParam String userName, @RequestParam String passwd, @RequestParam("picture")MultipartFile picture, @RequestParam("banner") MultipartFile banner){
         return ResponseEntity.ok(service.createUser(userName,passwd,picture,banner));
     }
-    //TODO: AUTH
     @GetMapping("/getUser")
     public ResponseEntity<Optional<User>> getUserPerId(@RequestParam String userId)
     {
@@ -66,5 +66,9 @@ public class UserController {
     @GetMapping("/decrypt")
     public String decrypt(@RequestParam String data) throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         return service.decrypt(data);
+    }
+    @PostMapping("/auth")
+    public ResponseEntity<String> auth(@RequestParam String userName, @RequestParam String password){
+        return service.auth(userName,password);
     }
 }

@@ -22,6 +22,8 @@ public class VideoService {
     private final UserService userService;
     @Autowired
     private final FileUploadService fileUploadService;
+    @Autowired
+    private SessionService sessionService;
 
 
     public HttpStatus createNewVideo(String title, String authorId, String description, MultipartFile videoFile,MultipartFile thumbnail) {
@@ -72,7 +74,7 @@ public class VideoService {
         }
         return "http://192.168.178.95/videos/" + videoId + "/" + videoId + typeFinished;
     }
-    public String convert(String type){
+    private String convert(String type){
         String convertedString = "";
         switch(type) {
             case "image/jpg":
@@ -147,13 +149,15 @@ public class VideoService {
         }
         return HttpStatus.BAD_REQUEST;
     }
-    public HttpStatus like(String videoId)
+    public HttpStatus like(String videoId,String session)
     {
         Optional<Video> videoById = videoRepo.findById(videoId);
-        if (videoById.isPresent()){
+        if (videoById.isPresent() && sessionService.isActive(session)){
             videoById.get().like();
             videoRepo.save(videoById.get());
             return HttpStatus.OK;
+        } else if (!sessionService.isActive(session)) {
+            return HttpStatus.UNAUTHORIZED;
         }
         return HttpStatus.BAD_REQUEST;
     }

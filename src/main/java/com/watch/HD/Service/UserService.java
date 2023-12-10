@@ -1,8 +1,10 @@
 package com.watch.HD.Service;
 
 import com.fasterxml.jackson.databind.ser.Serializers;
+import com.watch.HD.Model.Session;
 import com.watch.HD.Model.User;
 import com.watch.HD.Model.Video;
+import com.watch.HD.Repository.SessionRepo;
 import com.watch.HD.Repository.UserRepo;
 import com.watch.HD.Repository.VideoRepo;
 import lombok.AllArgsConstructor;
@@ -16,6 +18,7 @@ import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -26,6 +29,8 @@ public class UserService {
     private VideoRepo videoRepo;
     @Autowired
     FileUploadService uploadService;
+    @Autowired
+    SessionService sessionService;
     private final String key = "16SpxPMv2DNyw1JpjpWwKg==";
 
     public HttpStatus createUser(String userName, String passWd, MultipartFile picuture, MultipartFile banner) {
@@ -42,9 +47,9 @@ public class UserService {
         return HttpStatus.BAD_REQUEST;
     }
 
-    public HttpStatus addToUploaded(String userId, String videoId) {
+    public HttpStatus addToUploaded(Session session,String userId, String videoId) {
         Optional<User> userById = getUserById(userId);
-        if (userById.isPresent()) {
+        if (userById.isPresent() && session.isActive(LocalDateTime.now())) {
             userById.get().addToUploaded(videoId);
             return HttpStatus.OK;
         }
@@ -110,9 +115,22 @@ public class UserService {
         userRepo.saveAll(all);
     }
     //TODO: fix auth section
-    public ResponseEntity<String> auth() {
-        //TODO: ijasd
-        return ResponseEntity.ok("");
+    public ResponseEntity<String> auth(String userName,String password) {
+        Optional<User> byUserName = userRepo.findByUserName(userName);
+        if(byUserName.isPresent()){
+            if (byUserName.get().getPasswd().equals(password)) {
+                if (sessionService.isActiveByUser(byUserName.get().getId())){
+                    return ResponseEntity.ok(sessionService.getSessionByUser(byUserName.get().getId()));
+                }
+                else{
+                    sessionService.deleteSession(sessionService.getSessionByUser(byUserName.get().getId()));
+                    Session newSession = new Session(byUserName.get().getId());
+                    sessionService.save(newSession);
+                    return ResponseEntity.ok(newSession.getSession());
+                }
+            }
+        }
+        return ResponseEntity.badRequest().build();
     }
     public String decrypt(String encryptedText) throws NoSuchPaddingException, NoSuchAlgorithmException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
         Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");

@@ -33,7 +33,6 @@ public class FileUploadService {
     private String getVideoUrl(){return "";}
     public boolean uploadThumbnail(MultipartFile file,String videoId,String title) {
         try {
-            //TODO: rename file to id
             if (!file.isEmpty() && videoId != null){
                 file.transferTo(new File(VIDEO_PATH + videoId + "/" + file.getOriginalFilename()));
                 renameFileImage(file.getOriginalFilename(),videoId,videoId,file.getContentType());
@@ -91,14 +90,11 @@ public class FileUploadService {
         new File(PATH + "/videos").mkdir();
         new File(PATH + "/videos/" + id).mkdir();
     }
-    private String renameFile(String oldname,String newName,String videoId,String type){
+    private boolean renameFile(String oldname,String newName,String videoId,String type){
         File file = new File(VIDEO_PATH + videoId +"/" + oldname);
         File rename = new File(VIDEO_PATH + videoId +"/" + newName + convertVideoFileTypeToString(type));
-        boolean status = file.renameTo(rename);
-        if (status){
-            return "success";
-        }
-        return "failed";
+        return file.renameTo(rename);
+
     }
     //TODO: rename method
     private String renameFileImage(String oldname,String newName,String videoId,String type) {
@@ -156,9 +152,12 @@ public class FileUploadService {
     public String getPicturePath(String userId,String type){
         return "http://192.169.178.95/users/" + userId + "/" + "profilePicture" + converteFileTypeToString(type);
     }
+    //TODO: implement
     public boolean deleteVideo(String videoId){
+
         return false;
     }
+    //TODO: implement
     public boolean deleteUserData(String userId){
         return false;
     }
