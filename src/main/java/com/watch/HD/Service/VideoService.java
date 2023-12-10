@@ -41,6 +41,7 @@ public class VideoService {
                     videoRepo.save(video); //TODO: delete video if problems
                     return HttpStatus.OK;
             }
+            videoRepo.delete(video);
         }
         return HttpStatus.BAD_REQUEST;
     }

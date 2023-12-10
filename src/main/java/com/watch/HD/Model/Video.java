@@ -30,6 +30,7 @@ public class Video {
     private Content thumbnailData;
     @ManyToOne(cascade = CascadeType.ALL)
     private Content videoData;
+    private long videoDuration;
     private LocalDateTime uploadDate;
     //default constructor
     public Video(){}
@@ -48,5 +49,5 @@ public class Video {
         this.profilePicture = profilePicture;
     }
     public void view(){views++;}
-    public void  like(){likes++;}
+    public void like(){likes++;}
 }

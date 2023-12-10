@@ -99,7 +99,6 @@ public class FileUploadService {
         return file.renameTo(rename);
 
     }
-    //TODO: rename method
     private String renameFileImage(String oldname,String newName,String videoId,String type) {
         File file = new File(VIDEO_PATH + videoId + "/" + oldname);
         File rename = new File(VIDEO_PATH + videoId + "/" + newName + converteFileTypeToString(type));

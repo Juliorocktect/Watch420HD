@@ -23,7 +23,7 @@ import java.util.Optional;
 
 @RestController
 @AllArgsConstructor
-@CrossOrigin(origins = {"http://loclhost:3000","http://192.168.178.95:3000"})
+@CrossOrigin(origins = {"http://loclhost:3000","http://192.168.178.95:3000"}) //TODO: fix for localhost
 @Controller
 @RequestMapping("/user")
 public class UserController {

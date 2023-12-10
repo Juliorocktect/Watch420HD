@@ -135,6 +135,7 @@ public class UserService {
         }
         return ResponseEntity.badRequest().build();
     }
+    //TODO: fix
     public String decrypt(String encryptedText) throws NoSuchPaddingException, NoSuchAlgorithmException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
         Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
         byte[] encoded =  Base64.getDecoder().decode(key);
@@ -143,7 +144,7 @@ public class UserService {
         byte[] bytes = cipher.doFinal(Base64.getEncoder().encode(encryptedText.getBytes()));
         return bytes.toString();
     }
-
+    //TODO:make theme work
     public String encrypt(String text) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
         byte[] data = text.getBytes();
         Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
@@ -152,7 +153,6 @@ public class UserService {
         cipher.init(Cipher.ENCRYPT_MODE,secretKey);
         return Base64.getDecoder().decode(cipher.doFinal(text.getBytes())).toString();
     }
-
 
     public ResponseEntity<HttpStatus> delete(String userId, String session) {
         if (checkIfUserExists(userId)){
