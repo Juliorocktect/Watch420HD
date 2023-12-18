@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 @Data
@@ -26,15 +28,14 @@ public class Video {
     private String videoUrl;
     private String thumbnailUrl;
     private String profilePicture;
-    @ManyToOne(cascade = CascadeType.ALL)
-    private Content thumbnailData;
-    @ManyToOne(cascade = CascadeType.ALL)
-    private Content videoData;
     private long videoDuration;
     private LocalDateTime uploadDate;
+    private ArrayList<String> videoTags;
     //default constructor
+    private String videoType;
+    //TODO: https://stackoverflow.com/questions/29984612/how-can-i-get-video-length-in-java
     public Video(){}
-    public Video(String title, String authorId, String description,String profilePicture)
+    public Video(String title, String authorId, String description,String profilePicture,String videoType)
     {
         this.title = title;
         this.authorId = authorId;
@@ -43,10 +44,10 @@ public class Video {
         likes = 0;
         videoUrl = "";
         thumbnailUrl = "";
-        videoData = new Content(title);
-        thumbnailData = new Content(title);
         uploadDate = LocalDateTime.now();
         this.profilePicture = profilePicture;
+        videoTags = new ArrayList<>();
+        this.videoType = videoType;
     }
     public void view(){views++;}
     public void like(){likes++;}

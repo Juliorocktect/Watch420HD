@@ -1,9 +1,9 @@
 package com.watch.HD.Service;
 
-import com.watch.HD.Model.Content;
 import com.watch.HD.Model.User;
 import com.watch.HD.Model.Video;
 import com.watch.HD.Repository.VideoRepo;
+import com.watch.HD.Response.TrendsResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,9 +11,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Queue;
 
 @Service
 @AllArgsConstructor
@@ -28,14 +28,12 @@ public class VideoService {
 
     public HttpStatus createNewVideo(String title, String authorId, String description, MultipartFile videoFile,MultipartFile thumbnail) {
         if (userService.checkIfUserExists(authorId)){
-            Video video = new Video(title,authorId,description,userService.getUserById(authorId).get().getPictureUrl());
+            Video video = new Video(title,authorId,description,userService.getUserById(authorId).get().getPictureUrl(),videoFile.getContentType());
             videoRepo.save(video);
             if((fileUploadService.uploadVideo(videoFile,video.getId(),video.getTitle())
                     && (videoRepo.findById(video.getId()).isPresent()))
                     && (fileUploadService.uploadThumbnail(thumbnail, video.getId(),video.getTitle()))
             ) {
-                    video.setVideoData( new Content(video.getTitle(),convert(videoFile.getContentType()),getVideoUrl(video.getId()),videoFile.getSize()));
-                    video.setThumbnailData(new Content(video.getTitle(),convert(thumbnail.getContentType()),getThumbnailOutUrl(video.getId(),thumbnail.getContentType()),thumbnail.getSize()));
                     video.setThumbnailUrl(getThumbnailOutUrl(video.getId(),thumbnail.getContentType()));
                     video.setVideoUrl(getVideoUrl(video.getId()));
                     videoRepo.save(video); //TODO: delete video if problems
@@ -108,7 +106,7 @@ public class VideoService {
     }
     public ResponseEntity<List<Video>> getVideosByLimit(int limit){
         List<Video> list = videoRepo.findAll().stream().limit(limit).toList();
-        if (list.size() < limit){
+        if (list.size() > limit){
             return (ResponseEntity<List<Video>>) ResponseEntity.badRequest();
         }
         return ResponseEntity.ok(list);
@@ -163,31 +161,6 @@ public class VideoService {
         return HttpStatus.BAD_REQUEST;
     }
 
-    public ResponseEntity<Queue<Video>> getTenMostTrending() {
-        List<Video> videoList = videoRepo.findAll().stream().limit(10).toList();
-        Queue<Video> videos = null;
-        for (Video v:videoList){
-            videos.add(v);
-        }
-        Queue<Video> hilfsQ = null;
-        Video safe;
-        while (!videos.isEmpty()) {
-            safe = videos.element();
-            while (!videos.isEmpty()) {
-                if (videos.element().getLikes() > safe.getLikes()) {
-                    hilfsQ.add(safe);
-                    safe = videos.element();
-                    videos.remove();
-                } else {
-                    hilfsQ.add(videos.element());
-                    videos.remove();
-                }
-                videos = hilfsQ;
-            }
-        }
-        //TODO: add bad request trigger
-        return ResponseEntity.ok(videos);
-    }
     //TODO: still needed
     public void updatePath(){
         List<Video> all = videoRepo.findAll();
@@ -211,5 +184,16 @@ public class VideoService {
             ResponseEntity.internalServerError().build();
         }
         return ResponseEntity.badRequest().build();
+    }
+    public ResponseEntity<List<TrendsResponse>> getTenTrending(){
+        List<Video> mostLikes = videoRepo.getMostLikes();
+        if(!mostLikes.isEmpty()){
+            List<TrendsResponse> response = new ArrayList<>();
+            for (Video v: mostLikes){
+                response.add(new TrendsResponse(v.getThumbnailUrl(),v.getId()));
+            }
+            return ResponseEntity.ok(response);
+        }
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

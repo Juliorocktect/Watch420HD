@@ -1,6 +1,7 @@
 package com.watch.HD.Controller;
 
 import com.watch.HD.Model.Video;
+import com.watch.HD.Response.TrendsResponse;
 import com.watch.HD.Service.StreamingService;
 import com.watch.HD.Service.VideoService;
 import org.springframework.core.io.Resource;
@@ -62,8 +63,9 @@ public class VideoController {
     {
         return "";
     }
-    public ResponseEntity<Queue<Video>> getTenMostTrending(){
-        return videoService.getTenMostTrending();
+    @GetMapping("/trends")
+    public ResponseEntity<List<TrendsResponse>> getTenMostTrending(){
+        return videoService.getTenTrending();
     }
     public ResponseEntity<HttpStatus> getAuthorIdPerVideoId(String videoId){return null;}
     public ResponseEntity<HttpStatus> like(){return null;}

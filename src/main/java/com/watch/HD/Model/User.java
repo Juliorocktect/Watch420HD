@@ -6,6 +6,7 @@ import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.stereotype.Component;
 import java.util.ArrayList;
+import java.util.Map;
 
 @Component
 @Table(name = "_user")
@@ -23,7 +24,12 @@ public class User {
     private String bannerUrl;
     private ArrayList<String> liked;
     private ArrayList<String> videosUploaded;
+    private ArrayList<String> videosWatched;
+    private ArrayList<String> videosSaved;
+    //private Map<String,Integer> watchTime;
     //subs
+    //gender
+    //age
     //default Constructor
     public User(){
     }
@@ -35,6 +41,8 @@ public class User {
         this.bannerUrl = "";
         this.liked = new ArrayList<>();
         this.videosUploaded = new ArrayList<>();
+        videosWatched = new ArrayList<>();
+        videosSaved = new ArrayList<>();
     }
     public void addLiked(String like){
         liked.add(like);

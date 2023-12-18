@@ -12,6 +12,7 @@
 - [ ] rewrite methods for complete sql(optional)
 - [ ] remove of videoContent class 
 - [ ] length of video in seconds
+- [ ] tests
 - [x] auth for user with sessions
 - [x] File Operations
 - [x] like
