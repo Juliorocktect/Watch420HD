@@ -26,6 +26,7 @@ public class User {
     private ArrayList<String> videosUploaded;
     private ArrayList<String> videosWatched;
     private ArrayList<String> videosSaved;
+    //TODO: refactor in new class
     //private Map<String,Integer> watchTime;
     //subs
     //gender

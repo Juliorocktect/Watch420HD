@@ -4,6 +4,9 @@ import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLOutput;
@@ -33,12 +36,12 @@ public class FileUploadService {
         }
         return false;
     }
-    private String getVideoUrl(){return "";}
     public boolean uploadThumbnail(MultipartFile file,String videoId,String title) {
         try {
             if (!file.isEmpty() && videoId != null){
                 file.transferTo(new File(VIDEO_PATH + videoId + "/" + file.getOriginalFilename()));
                 renameFileImage(file.getOriginalFilename(),videoId,videoId,file.getContentType());
+                imageCompress(VIDEO_PATH + videoId + "/" + videoId + converteFileTypeToString(file.getContentType()));
                 return true;
             }
             return false;
@@ -97,16 +100,11 @@ public class FileUploadService {
         File file = new File(VIDEO_PATH + videoId +"/" + oldname);
         File rename = new File(VIDEO_PATH + videoId +"/" + newName + convertVideoFileTypeToString(type));
         return file.renameTo(rename);
-
     }
-    private String renameFileImage(String oldname,String newName,String videoId,String type) {
+    private boolean renameFileImage(String oldname,String newName,String videoId,String type) {
         File file = new File(VIDEO_PATH + videoId + "/" + oldname);
         File rename = new File(VIDEO_PATH + videoId + "/" + newName + converteFileTypeToString(type));
-        boolean status = file.renameTo(rename);
-        if (status) {
-            return "success"; // was hab ich mir dabei gedacht?
-        }
-        return "failed";
+        return file.renameTo(rename);
     }
     private String renameFileImage(String path,String oldname,String newName,String videoId,String type) {
         File file = new File(path + videoId + "/" + oldname);
@@ -143,8 +141,6 @@ public class FileUploadService {
                 break;
             case "image/jpeg":
                 convertedString = ".jpeg";// ist btw das gleiche wie jpg
-            default:
-                System.out.println("Falscher DateiTyp");
         }
         return convertedString;
     }
@@ -171,6 +167,30 @@ public class FileUploadService {
             System.out.println("Error Deleting User: " + e.getMessage());
             return false;
         }
+    }
+    private void imageCompress(String path){
+        try {
+
+            File input = new File(path);
+            File out = new File(path);
+            Image img = ImageIO.read(input);
+            BufferedImage imageTmp = resizeImage(img,600,400);
+            String imageType = input.getName().substring(input.getName().lastIndexOf('.')+1);
+            ImageIO.write(imageTmp,imageType,out);
+        } catch (IOException e){
+            System.out.println("Error resizing image");
+        }
+    }
+    private BufferedImage resizeImage(final Image image,final int width,final int height){
+        final BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        final Graphics2D graphics2D = bufferedImage.createGraphics();
+        graphics2D.setComposite(AlphaComposite.Src);
+        graphics2D.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        graphics2D.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        graphics2D.drawImage(image, 0, 0, width, height, null);
+        graphics2D.dispose();
+        return bufferedImage;
     }
 
 
