@@ -17,7 +17,7 @@ public class SessionService {
         if(session.isPresent() && session.get().isActive(LocalDateTime.now())){
             return true;
         }
-        else{
+        else{ // else unecessary
             deleteSession(sessionId);
         }
         return false;
@@ -50,5 +50,12 @@ public class SessionService {
             return byUserId.get().getUserId().equals(userId) && byUserId.get().getSession().equals(session);
         }
         return false;
+    }
+
+    public String getUserBySession(String session) {
+        if(isActive(session)){
+            return sessionRepo.findById(session).get().getUserId();
+        }
+        return "";
     }
 }

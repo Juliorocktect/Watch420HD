@@ -23,7 +23,7 @@ import java.util.Optional;
 
 @RestController
 @AllArgsConstructor
-@CrossOrigin(origins = {"http://loclhost:3000","http://192.168.178.95:3000"}) //TODO: fix for localhost
+@CrossOrigin(origins = {"http://localhost:3000","http://192.168.178.95:3000"}) //TODO: fix for localhost
 @Controller
 @RequestMapping("/user")
 public class UserController {
@@ -74,5 +74,17 @@ public class UserController {
     @DeleteMapping("/delete")
     public ResponseEntity<HttpStatus> delete(@RequestParam String userId,@RequestParam String session){
         return service.delete(userId,session);
+    }
+    @PostMapping("/addToSaved")
+    public ResponseEntity addToSaved(@RequestParam String session,@RequestParam String videoId){
+        return service.addVideoToSaved(session,videoId);
+    }
+    @DeleteMapping("/removeFromSaved")
+    public ResponseEntity removeFromSaved(@RequestParam String session,@RequestParam String videoId){
+        return service.removeFromSaved(session,videoId);
+    }
+    @GetMapping("/getAllSaved")
+    public ResponseEntity<List<Video>> getAllSaved(@RequestParam String session){
+        return service.getSavedVideos(session);
     }
 }

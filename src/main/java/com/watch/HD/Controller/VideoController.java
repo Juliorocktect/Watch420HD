@@ -34,10 +34,11 @@ public class VideoController {
             @RequestParam String title,
             @RequestParam String authorId,
             @RequestParam String description,
+            @RequestParam String session,
             @RequestParam("videoFile") MultipartFile videoFile,
             @RequestParam("thumbnailFile") MultipartFile thumbnailFile
     ){
-        return videoService.createNewVideo(title,authorId,description,videoFile,thumbnailFile);
+        return videoService.createNewVideo(title,authorId,description,videoFile,thumbnailFile,session);
     }
     @GetMapping("/getVideoById")
     public ResponseEntity<Video> getVideoPerId(@RequestParam String videoId)
@@ -83,4 +84,6 @@ public class VideoController {
     public ResponseEntity<HttpStatus> delete(@RequestParam String videoId,@RequestParam String session){
         return videoService.delete(videoId,session);
     }
+    //TODO: remove like endpoint
+    //TODO: save and remove saved endpoint
 }

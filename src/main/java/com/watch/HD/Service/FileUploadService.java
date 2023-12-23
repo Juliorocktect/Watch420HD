@@ -168,6 +168,7 @@ public class FileUploadService {
             return false;
         }
     }
+    //TODO: open new Thread
     private void imageCompress(String path){
         try {
 

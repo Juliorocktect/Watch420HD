@@ -9,6 +9,8 @@ import com.watch.HD.Repository.UserRepo;
 import com.watch.HD.Repository.VideoRepo;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.config.RepositoryNameSpaceHandler;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
@@ -19,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
 import javax.swing.*;
+import java.net.http.HttpResponse;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
@@ -31,9 +34,9 @@ public class UserService {
     @Autowired
     private VideoRepo videoRepo;
     @Autowired
-    FileUploadService uploadService;
+    private FileUploadService uploadService;
     @Autowired
-    SessionService sessionService;
+    private SessionService sessionService;
     private final String key = "16SpxPMv2DNyw1JpjpWwKg==";
 
     public HttpStatus createUser(String userName, String passWd, MultipartFile picuture, MultipartFile banner) {
@@ -50,9 +53,9 @@ public class UserService {
         return HttpStatus.BAD_REQUEST;
     }
 
-    public HttpStatus addToUploaded(Session session,String userId, String videoId) {
+    public HttpStatus addToUploaded(String session,String userId, String videoId) {
         Optional<User> userById = getUserById(userId);
-        if (userById.isPresent() && session.isActive(LocalDateTime.now())) {
+        if (userById.isPresent() && sessionService.isActive(session)) {
             userById.get().addToUploaded(videoId);
             return HttpStatus.OK;
         }
@@ -144,7 +147,7 @@ public class UserService {
         byte[] bytes = cipher.doFinal(Base64.getEncoder().encode(encryptedText.getBytes()));
         return bytes.toString();
     }
-    //TODO:make theme work
+    //TODO:make thread work
     public String encrypt(String text) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
         byte[] data = text.getBytes();
         Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
@@ -168,6 +171,46 @@ public class UserService {
             else{
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
+        }
+        return ResponseEntity.badRequest().build();
+    }
+    public ResponseEntity<List<Video>> getSavedVideos(String session){
+        if(sessionService.isActive(session)){
+            String userId = sessionService.getUserBySession(session);
+            Optional<User> user = userRepo.findById(userId);
+            if(user.isPresent()){
+                List<Video> videos = new ArrayList<>();
+                for (String s : user.get().getVideosSaved()){
+                    videos.add(videoRepo.findById(s).get());
+                }
+                return ResponseEntity.ok(videos);
+            }
+        }
+        return ResponseEntity.status(403).build();
+    }
+    public ResponseEntity addVideoToSaved(String session, String videoId){
+        String userId = sessionService.getUserBySession(session);
+        if(!userId.equals("")){
+            Optional<User> userById = userRepo.findById(userId);
+            if (userById.isPresent()) {
+                userById.get().addToSaved(videoId);
+                userRepo.save(userById.get());
+                return ResponseEntity.ok().build();
+            }
+            return ResponseEntity.status(403).build();
+        }
+        return ResponseEntity.badRequest().build();
+    }
+    public ResponseEntity removeFromSaved(String session,String videoId){
+        String userId = sessionService.getUserBySession(session);
+        if(!userId.equals("")){
+            Optional<User> byId = userRepo.findById(userId);
+            if (byId.isPresent()) {
+                byId.get().removeFromSavd(videoId);
+                userRepo.save(byId.get());
+                return ResponseEntity.ok().build();
+            }
+            return ResponseEntity.status(403).build();
         }
         return ResponseEntity.badRequest().build();
     }

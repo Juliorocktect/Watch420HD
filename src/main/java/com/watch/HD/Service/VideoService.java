@@ -24,9 +24,7 @@ public class VideoService {
     private final FileUploadService fileUploadService;
     @Autowired
     private SessionService sessionService;
-
-
-    public HttpStatus createNewVideo(String title, String authorId, String description, MultipartFile videoFile,MultipartFile thumbnail) {
+    public HttpStatus createNewVideo(String title, String authorId, String description, MultipartFile videoFile,MultipartFile thumbnail,String session) {
         if (userService.checkIfUserExists(authorId)){
             Video video = new Video(title,authorId,description,userService.getUserById(authorId).get().getPictureUrl(),videoFile.getContentType());
             videoRepo.save(video);
@@ -36,7 +34,8 @@ public class VideoService {
             ) {
                     video.setThumbnailUrl(getThumbnailOutUrl(video.getId(),thumbnail.getContentType()));
                     video.setVideoUrl(getVideoUrl(video.getId()));
-                    videoRepo.save(video); //TODO: delete video if problems
+                    userService.addToUploaded(session,authorId,video.getId());
+                    videoRepo.save(video); //TODO: delete video if problems occure
                     return HttpStatus.OK;
             }
             videoRepo.delete(video);
@@ -48,7 +47,7 @@ public class VideoService {
         if (byId.isPresent()){
             return ResponseEntity.ok(byId.get());
         }
-        return (ResponseEntity<Video>) ResponseEntity.badRequest();
+        return ResponseEntity.badRequest().build();
     }
     public Video getVideoWithId(String videoId){
         Optional<Video> byId = videoRepo.findById(videoId);

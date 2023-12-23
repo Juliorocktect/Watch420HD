@@ -22,15 +22,13 @@ public class User {
     private String passwd;
     private String pictureUrl;
     private String bannerUrl;
+    private int subs;
     private ArrayList<String> liked;
     private ArrayList<String> videosUploaded;
     private ArrayList<String> videosWatched;
     private ArrayList<String> videosSaved;
-    //TODO: refactor in new class
-    //private Map<String,Integer> watchTime;
-    //subs
-    //gender
-    //age
+    @OneToOne(cascade=CascadeType.PERSIST)
+    private UserData userData;
     //default Constructor
     public User(){
     }
@@ -44,6 +42,10 @@ public class User {
         this.videosUploaded = new ArrayList<>();
         videosWatched = new ArrayList<>();
         videosSaved = new ArrayList<>();
+        userData = new UserData();
+        userData.addTopCategory("Sui");
+        userData.setAge(21);
+        userData.addWatchTime("8971231",12);
     }
     public void addLiked(String like){
         liked.add(like);
@@ -51,4 +53,17 @@ public class User {
     public void addToUploaded(String videoId){
         videosUploaded.add(videoId);
     }
+    public void addToWatched(String videoId){
+        videosWatched.add(videoId);
+    }
+    public void removeLike(String videoId){
+        liked.remove(videoId);
+    }
+    public void addToSaved(String id){
+        videosSaved.add(id);
+    }
+    public void removeFromSavd(String id){
+        videosSaved.remove(id);
+    }
 }
+
