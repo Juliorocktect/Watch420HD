@@ -171,7 +171,6 @@ public class FileUploadService {
     //TODO: open new Thread
     private void imageCompress(String path){
         try {
-
             File input = new File(path);
             File out = new File(path);
             Image img = ImageIO.read(input);

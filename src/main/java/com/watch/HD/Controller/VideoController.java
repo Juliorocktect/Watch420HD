@@ -68,22 +68,13 @@ public class VideoController {
     public ResponseEntity<List<TrendsResponse>> getTenMostTrending(){
         return videoService.getTenTrending();
     }
-    public ResponseEntity<HttpStatus> getAuthorIdPerVideoId(String videoId){return null;}
-    public ResponseEntity<HttpStatus> like(){return null;}
     @PostMapping("/view")
     public HttpStatus view(@RequestParam String videoId)
     {
         return videoService.view(videoId);
     }
-    @PostMapping("/like")
-    public HttpStatus like(@RequestParam String videoId,@RequestParam String session)
-    {
-        return videoService.like(videoId,session);
-    }
     @DeleteMapping("/delete")
     public ResponseEntity<HttpStatus> delete(@RequestParam String videoId,@RequestParam String session){
         return videoService.delete(videoId,session);
     }
-    //TODO: remove like endpoint
-    //TODO: save and remove saved endpoint
 }

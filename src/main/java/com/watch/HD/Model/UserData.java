@@ -27,16 +27,19 @@ public class UserData {
     private Map<String,Integer> watchTime;
     private int age;
     private ArrayList<String> topCategories;
+    private ArrayList<String> recommendedVideos;
 
     public UserData(int age){
         this.age = age;
         watchTime = new HashMap<>();
         topCategories = new ArrayList<>();
+        recommendedVideos = new ArrayList<>();
     }
     public UserData(){
         this.age = 0;
         watchTime = new HashMap<>();
         topCategories = new ArrayList<>();
+        recommendedVideos = new ArrayList<>();
     }
     public void addWatchTime(String videoId,int watchTime)
     {
@@ -45,6 +48,10 @@ public class UserData {
     public void addTopCategory(String category)
     {
         topCategories.add(category);
+    }
+
+    public void addRecommendedVideo(String videoId){
+        recommendedVideos.add(videoId);
     }
 
 }

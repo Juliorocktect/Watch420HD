@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import java.net.http.HttpResponse;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
@@ -83,8 +84,32 @@ public class UserController {
     public ResponseEntity removeFromSaved(@RequestParam String session,@RequestParam String videoId){
         return service.removeFromSaved(session,videoId);
     }
-    @GetMapping("/getAllSaved")
+    @PostMapping("/watch")
+    public ResponseEntity watch(@RequestParam String session,@RequestParam String videoId){
+        return service.addToHistory(session,videoId);
+    }
+    @GetMapping("/saved")
     public ResponseEntity<List<Video>> getAllSaved(@RequestParam String session){
         return service.getSavedVideos(session);
+    }
+    @PostMapping("/like")
+    public ResponseEntity like(@RequestParam String session,@RequestParam String videoId){
+        return service.like(session,videoId);
+    }
+    @GetMapping("/isValid")
+    public boolean isCookieValid(@RequestParam String session){
+        return service.isSessionValid(session);
+    }
+    @GetMapping("/history")
+    public ResponseEntity<List<Video>> getHistory(@RequestParam String session){
+        return service.getHistory(session);
+    }
+    @GetMapping("/liked")
+    public ResponseEntity<List<Video>> getLiked(@RequestParam String session){
+        return service.getLiked(session);
+    }
+    @GetMapping("/upload")
+    public ResponseEntity<List<Video>> getUploaded(@RequestParam String session){
+        return service.getUploaded(session);
     }
 }

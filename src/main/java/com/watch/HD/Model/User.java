@@ -65,5 +65,9 @@ public class User {
     public void removeFromSavd(String id){
         videosSaved.remove(id);
     }
+
+    public boolean hasLiked(String videoId){
+        return liked.contains(videoId);
+    }
 }
 

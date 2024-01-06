@@ -51,4 +51,8 @@ public class Video {
     }
     public void view(){views++;}
     public void like(){likes++;}
+
+    public void removeLike() {
+        likes--;
+    }
 }

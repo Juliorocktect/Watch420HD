@@ -80,7 +80,6 @@ public class UserService {
         }
         return HttpStatus.BAD_REQUEST;
     }
-
     public ResponseEntity<List<Video>> getVideosByUser(String userId) {
         Optional<User> byId = userRepo.findById(userId);
         if (byId.isPresent()) {
@@ -181,16 +180,20 @@ public class UserService {
             if(user.isPresent()){
                 List<Video> videos = new ArrayList<>();
                 for (String s : user.get().getVideosSaved()){
-                    videos.add(videoRepo.findById(s).get());
+                    Optional<Video> current = videoRepo.findById(s);
+                    if (current.isPresent()){
+                        videos.add(current.get());
+                    }
                 }
                 return ResponseEntity.ok(videos);
             }
+            return ResponseEntity.badRequest().build();
         }
-        return ResponseEntity.status(403).build();
+        return ResponseEntity.status(401).build();
     }
     public ResponseEntity addVideoToSaved(String session, String videoId){
-        String userId = sessionService.getUserBySession(session);
-        if(!userId.equals("")){
+        if (sessionService.isActive(session)) {
+            String userId = sessionService.getUserBySession(session);
             Optional<User> userById = userRepo.findById(userId);
             if (userById.isPresent()) {
                 userById.get().addToSaved(videoId);
@@ -208,6 +211,108 @@ public class UserService {
             if (byId.isPresent()) {
                 byId.get().removeFromSavd(videoId);
                 userRepo.save(byId.get());
+                return ResponseEntity.ok().build();
+            }
+            return ResponseEntity.status(403).build();
+        }
+        return ResponseEntity.badRequest().build();
+    }
+
+    public boolean isSessionValid(String session) {
+        if (sessionService.isActive(session))
+            return true;
+        else
+            return false;
+    }
+    //TODO: implement
+    public ResponseEntity<List<Video>> getHistory(String session) {
+        if(sessionService.isActive(session)){
+            String userBySession = sessionService.getUserBySession(session);
+            Optional<User> byId = userRepo.findById(userBySession);
+            if(byId.isPresent()){
+                ArrayList<String> ids = byId.get().getVideosWatched();
+                List<Video> found = new ArrayList<>();
+                for (String i : ids){
+                    Optional<Video> current = videoRepo.findById(i);
+                    if(current.isPresent()){
+                        found.add(current.get());
+                    }
+                }
+                return ResponseEntity.ok(found);
+            }
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.status(401).build();
+    }
+
+    public ResponseEntity<List<Video>> getLiked(String session) {
+        if(sessionService.isActive(session)){
+            String userId = sessionService.getUserBySession(session);
+            Optional<User> user = userRepo.findById(userId);
+            if(user.isPresent()){
+                List<Video> videos = new ArrayList<>();
+                for (String s : user.get().getLiked()){
+                    Optional<Video> current = videoRepo.findById(s);
+                    if (current.isPresent()){
+                        videos.add(current.get());
+                    }
+                }
+                return ResponseEntity.ok(videos);
+            }
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.status(401).build();
+    }
+
+    public ResponseEntity<List<Video>> getUploaded(String session) {
+        if(sessionService.isActive(session)){
+            String userId = sessionService.getUserBySession(session);
+            Optional<User> user = userRepo.findById(userId);
+            if(user.isPresent()){
+                List<Video> videos = new ArrayList<>();
+                for (String s : user.get().getVideosUploaded()){
+                    Optional<Video> current = videoRepo.findById(s);
+                    if (current.isPresent()){
+                        videos.add(current.get());
+                    }
+                }
+                return ResponseEntity.ok(videos);
+            }
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.status(401).build();
+    }
+    public ResponseEntity like(String session,String videoId) {
+        if (sessionService.isActive(session)) {
+            Optional<User> byId = userRepo.findById(sessionService.getUserBySession(session));
+            Optional<Video> video = videoRepo.findById(videoId);
+            if (byId.isPresent() && video.isPresent()) {
+                if (byId.get().hasLiked(videoId)) {
+                    byId.get().removeLike(videoId);
+                    video.get().removeLike();
+                    videoRepo.save(video.get());
+                    userRepo.save(byId.get());
+                    return ResponseEntity.ok().build();
+                } else {
+                    byId.get().addLiked(videoId);
+                    video.get().like();
+                    videoRepo.save(video.get());
+                    userRepo.save(byId.get());
+                    return ResponseEntity.ok().build();
+                }
+            }
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.status(401).build();
+    }
+
+    public ResponseEntity addToHistory(String session, String videoId) {
+        if (sessionService.isActive(session)) {
+            String userId = sessionService.getUserBySession(session);
+            Optional<User> userById = userRepo.findById(userId);
+            if (userById.isPresent()) {
+                userById.get().addToWatched(videoId);
+                userRepo.save(userById.get());
                 return ResponseEntity.ok().build();
             }
             return ResponseEntity.status(403).build();
