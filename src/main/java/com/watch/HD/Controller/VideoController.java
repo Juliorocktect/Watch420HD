@@ -2,6 +2,7 @@ package com.watch.HD.Controller;
 
 import com.watch.HD.Model.Video;
 import com.watch.HD.Response.TrendsResponse;
+import com.watch.HD.Service.RecommendationService;
 import com.watch.HD.Service.StreamingService;
 import com.watch.HD.Service.VideoService;
 import org.springframework.core.io.Resource;
@@ -12,10 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Mono;
 
-import java.net.http.HttpResponse;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
+import java.util.Map;
 
 @RestController
 @Component
@@ -30,7 +29,7 @@ public class VideoController {
         this.streamingService = streamingService;
     }
     @PostMapping("/upload")
-    public HttpStatus upload(
+    public ResponseEntity upload(
             @RequestParam String title,
             @RequestParam String authorId,
             @RequestParam String description,
@@ -77,4 +76,5 @@ public class VideoController {
     public ResponseEntity<HttpStatus> delete(@RequestParam String videoId,@RequestParam String session){
         return videoService.delete(videoId,session);
     }
+
 }

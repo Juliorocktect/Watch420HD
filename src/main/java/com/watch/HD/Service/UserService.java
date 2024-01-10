@@ -269,13 +269,7 @@ public class UserService {
             String userId = sessionService.getUserBySession(session);
             Optional<User> user = userRepo.findById(userId);
             if(user.isPresent()){
-                List<Video> videos = new ArrayList<>();
-                for (String s : user.get().getVideosUploaded()){
-                    Optional<Video> current = videoRepo.findById(s);
-                    if (current.isPresent()){
-                        videos.add(current.get());
-                    }
-                }
+                List<Video> videos = videoRepo.findAllById(user.get().getVideosUploaded());
                 return ResponseEntity.ok(videos);
             }
             return ResponseEntity.badRequest().build();

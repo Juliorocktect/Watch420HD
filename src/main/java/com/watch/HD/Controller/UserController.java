@@ -2,7 +2,9 @@ package com.watch.HD.Controller;
 
 import com.watch.HD.Model.User;
 import com.watch.HD.Model.Video;
+import com.watch.HD.Service.RecommendationService;
 import com.watch.HD.Service.UserService;
+import jakarta.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpOutputMessage;
@@ -20,6 +22,7 @@ import java.net.http.HttpResponse;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -29,6 +32,7 @@ import java.util.Optional;
 @RequestMapping("/user")
 public class UserController {
     private final UserService service;
+    private final RecommendationService recommendationService;
     @PostMapping("/createUser")
     public ResponseEntity<HttpStatus> createUser(@RequestParam String userName, @RequestParam String passwd, @RequestParam("picture")MultipartFile picture, @RequestParam("banner") MultipartFile banner){
         return ResponseEntity.ok(service.createUser(userName,passwd,picture,banner));
@@ -111,5 +115,9 @@ public class UserController {
     @GetMapping("/upload")
     public ResponseEntity<List<Video>> getUploaded(@RequestParam String session){
         return service.getUploaded(session);
+    }
+    @GetMapping("/recommend")
+    public List<Video> recommend(@Nullable @RequestParam String videoId,@Nullable @RequestParam String session){
+        return recommendationService.recommend("6daabef7-d1fb-4ba9-92bb-6fa323462bb3",session);
     }
 }

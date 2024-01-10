@@ -55,4 +55,11 @@ public class Video {
     public void removeLike() {
         likes--;
     }
+    public boolean containsOneTag(List<String> tags){
+        for (String s : tags){
+            if (videoTags.contains(s))
+                return true;
+        }
+        return false;
+    }
 }

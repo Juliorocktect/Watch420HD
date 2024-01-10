@@ -11,7 +11,7 @@ import java.util.Optional;
 @Service
 public class SessionService {
     @Autowired
-    public SessionRepo sessionRepo;
+    private SessionRepo sessionRepo;
     public boolean isActive(String sessionId){
         Optional<Session> session = sessionRepo.findById(sessionId);
         if(session.isPresent() && session.get().isActive(LocalDateTime.now())){

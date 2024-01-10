@@ -24,23 +24,26 @@ public class VideoService {
     private final FileUploadService fileUploadService;
     @Autowired
     private SessionService sessionService;
-    public HttpStatus createNewVideo(String title, String authorId, String description, MultipartFile videoFile,MultipartFile thumbnail,String session) {
-        if (userService.checkIfUserExists(authorId)){
-            Video video = new Video(title,authorId,description,userService.getUserById(authorId).get().getPictureUrl(),videoFile.getContentType());
-            videoRepo.save(video);
-            if((fileUploadService.uploadVideo(videoFile,video.getId(),video.getTitle())
-                    && (videoRepo.findById(video.getId()).isPresent()))
-                    && (fileUploadService.uploadThumbnail(thumbnail, video.getId(),video.getTitle()))
-            ) {
+    public ResponseEntity createNewVideo(String title, String authorId, String description, MultipartFile videoFile,MultipartFile thumbnail,String session) {
+        if (sessionService.isActive(session)){
+            if (userService.checkIfUserExists(authorId)){
+                Video video = new Video(title,authorId,description,userService.getUserById(authorId).get().getPictureUrl(),videoFile.getContentType());
+                videoRepo.save(video);
+                if((fileUploadService.uploadVideo(videoFile,video.getId(),video.getTitle())
+                        && (videoRepo.findById(video.getId()).isPresent()))
+                        && (fileUploadService.uploadThumbnail(thumbnail, video.getId(),video.getTitle()))
+                ) {
                     video.setThumbnailUrl(getThumbnailOutUrl(video.getId(),thumbnail.getContentType()));
                     video.setVideoUrl(getVideoUrl(video.getId()));
                     userService.addToUploaded(session,authorId,video.getId());
                     videoRepo.save(video); //TODO: delete video if problems occure
-                    return HttpStatus.OK;
+                    return ResponseEntity.ok().build();
+                }
+                videoRepo.delete(video);
             }
-            videoRepo.delete(video);
+            return ResponseEntity.badRequest().build();
         }
-        return HttpStatus.BAD_REQUEST;
+        return ResponseEntity.status(401).build();
     }
     public ResponseEntity<Video> getVideoById(String videoId){
         Optional<Video> byId = videoRepo.findById(videoId);

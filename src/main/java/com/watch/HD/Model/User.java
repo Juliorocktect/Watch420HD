@@ -69,5 +69,8 @@ public class User {
     public boolean hasLiked(String videoId){
         return liked.contains(videoId);
     }
+    public boolean hasWatched(String videoId){
+        return videosWatched.contains(videoId);
+    }
 }
 
