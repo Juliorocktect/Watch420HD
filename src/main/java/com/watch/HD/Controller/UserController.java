@@ -2,6 +2,7 @@ package com.watch.HD.Controller;
 
 import com.watch.HD.Model.User;
 import com.watch.HD.Model.Video;
+import com.watch.HD.Response.UserResponse;
 import com.watch.HD.Service.RecommendationService;
 import com.watch.HD.Service.UserService;
 import jakarta.annotation.Nullable;
@@ -119,5 +120,9 @@ public class UserController {
     @GetMapping("/recommend")
     public List<Video> recommend(@Nullable @RequestParam String videoId,@Nullable @RequestParam String session){
         return recommendationService.recommend("6daabef7-d1fb-4ba9-92bb-6fa323462bb3",session);
+    }
+    @GetMapping("/getBySession")
+    public ResponseEntity<UserResponse> getBySession(@RequestParam String session){
+        return service.getBySession(session);
     }
 }

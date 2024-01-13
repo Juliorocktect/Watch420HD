@@ -5,8 +5,10 @@ import com.watch.HD.Model.Session;
 import com.watch.HD.Model.User;
 import com.watch.HD.Model.Video;
 import com.watch.HD.Repository.SessionRepo;
+import com.watch.HD.Repository.UserDao;
 import com.watch.HD.Repository.UserRepo;
 import com.watch.HD.Repository.VideoRepo;
+import com.watch.HD.Response.UserResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.config.RepositoryNameSpaceHandler;
@@ -37,6 +39,8 @@ public class UserService {
     private FileUploadService uploadService;
     @Autowired
     private SessionService sessionService;
+    @Autowired
+    private UserDao userDao;
     private final String key = "16SpxPMv2DNyw1JpjpWwKg==";
 
     public HttpStatus createUser(String userName, String passWd, MultipartFile picuture, MultipartFile banner) {
@@ -312,5 +316,13 @@ public class UserService {
             return ResponseEntity.status(403).build();
         }
         return ResponseEntity.badRequest().build();
+    }
+    public ResponseEntity<UserResponse> getBySession(String session){
+        if(sessionService.isActive(session)){
+            String userId = sessionService.getUserBySession(session);
+            UserResponse user = userDao.getUserResponseById(userId);
+            System.out.println("Hallo");
+            return ResponseEntity.ok(user);        }
+        return ResponseEntity.status(401).build();
     }
 }

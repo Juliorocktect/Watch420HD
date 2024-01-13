@@ -11,7 +11,7 @@ import java.util.Map;
 @Component
 @Table(name = "_user")
 @Data
-@Entity
+@Entity(name = "user")
 @AllArgsConstructor
 public class User {
     @Id

@@ -13,7 +13,7 @@ import java.util.List;
 
 @Component
 @Data
-@Entity
+@Entity(name = "Videos")
 @Table(name = "videos")
 public class Video {
     @Id
